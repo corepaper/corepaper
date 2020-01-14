@@ -1,0 +1,5 @@
+= Core Paper
+Wei Tang <hi@that.world>
+
+Core Paper is a collection of specifications, reviews and descriptions
+of various blockchain projects.

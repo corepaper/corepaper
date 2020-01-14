@@ -1,0 +1,79 @@
+= Signed Mining
+Wei Tang <hi@that.world>
+:license: Apache-2.0
+
+A good mining algorithm for a blockchain must ensure
+*delibration*. That is, it must enforce that partcipants on the
+network are carrying out the action of mining as a deliberate
+action. Put it simply, the owner of miners must be aware that they are
+mining, and miners must be aware that they are actively spending their
+resources. Deliberation makes it more likely that the fundamental
+assumption of *honest majority* holds, and thus less likely to be the
+subject of 51% attacks.
+
+Absence of delibration leads to botnets and malicious browser-based
+mining. In all those cases, the owners of the hardwares are not aware
+that they are participating in the mining process. If a mining
+algorithm cannot prevent those types of issues, controllers of botnets
+may be able to obtain a large share of the network hashrate, and carry
+out attacks such as double spending.
+
+In this article, we discuss the idea of *signed mining* that tries to
+provide a safe construct with high degrees of delibration. Signed
+mining adds an additional requirement for mining hardware to hold the
+private key of coinbase of mining rewards. In this way, botnets and
+browser-based mining become much less efficient to carry out.
+
+== Basic
+
+Signed mining can be applied to any *nonce-based* mining
+algorithms. Those mining algorithms can be generalized to expose the
+following function:
+
+[source,rust]
+---
+fn verify(pre_hash: Hash, nonce: Nonce, seal: Seal) -> bool;
+---
+
+`pre_hash` is the hash of the header without PoW portion. `nonce` is a
+random number. The function `verify` checks that `pre_hash` and
+`nonce` evaluates to `seal`, and the resulting seal is above a given
+_difficulty_.
+
+The mining process can then be expressed as follows:
+
+[source,rust]
+---
+loop {
+  let nonce = Nonce::random();
+  let seal = Seal::generate_from(pre_hash, nonce);
+  if verify(pre_hash, nonce, seal) {
+    return nonce
+  }
+}
+---
+
+*Signed mining* proposes to add an additional signing _together with
+ the nonce_:
+
+[source,rust]
+---
+fn verify_signed(
+  pre_hash: Hash,
+  nonce: Nonce,
+  signature: Signature,
+  seal: Seal
+) -> bool {
+  signature.verify_with_message(pre_hash, nonce) &&
+    seal.verify_with_pre(signature)
+}
+---
+
+`pre_hash` and `nonce` are first signed by coinbase key producing
+`signature`. The `signature` is then fed into a normal nonce-based
+mining algorithm to produce the seal. The signing process happens once
+per nonce, and for mining, practically a large number of nonces are
+always tried before a block is produced. As a result, this enforces
+that mining hardwares must keep the private key together with the
+miner. Transmitting large amount of signatures through the network is
+impractical and inefficient.
