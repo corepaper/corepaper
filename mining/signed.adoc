@@ -1,6 +1,11 @@
 = Signed Mining
-Wei Tang <hi@that.world>
+Wei Tang <@sorpaas>
 :license: Apache-2.0
+
+[meta="description"]
+This article discusses the idea of signed mining, which tries to
+provide a safe construct with a high degrees of delibration, in a
+Proof of Work blockchain system.
 
 A good mining algorithm for a blockchain must ensure
 *delibration*. That is, it must enforce that partcipants on the
@@ -18,11 +23,10 @@ algorithm cannot prevent those types of issues, controllers of botnets
 may be able to obtain a large share of the network hashrate, and carry
 out attacks such as double spending.
 
-In this article, we discuss the idea of *signed mining* that tries to
-provide a safe construct with high degrees of delibration. Signed
-mining adds an additional requirement for mining hardware to hold the
-private key of coinbase of mining rewards. In this way, botnets and
-browser-based mining become much less efficient to carry out.
+Signed mining adds an additional requirement for mining hardware to
+hold the private key of coinbase of mining rewards. In this way,
+botnets and browser-based mining become much less efficient to carry
+out.
 
 == Basic
 
@@ -31,9 +35,7 @@ algorithms. Those mining algorithms can be generalized to expose the
 following function:
 
 [source,rust]
----
 fn verify(pre_hash: Hash, nonce: Nonce, seal: Seal) -> bool;
----
 
 `pre_hash` is the hash of the header without PoW portion. `nonce` is a
 random number. The function `verify` checks that `pre_hash` and
@@ -43,7 +45,6 @@ _difficulty_.
 The mining process can then be expressed as follows:
 
 [source,rust]
----
 loop {
   let nonce = Nonce::random();
   let seal = Seal::generate_from(pre_hash, nonce);
@@ -51,13 +52,11 @@ loop {
     return nonce
   }
 }
----
 
 *Signed mining* proposes to add an additional signing _together with
  the nonce_:
 
 [source,rust]
----
 fn verify_signed(
   pre_hash: Hash,
   nonce: Nonce,
@@ -67,7 +66,6 @@ fn verify_signed(
   signature.verify_with_message(pre_hash, nonce) &&
     seal.verify_with_pre(signature)
 }
----
 
 `pre_hash` and `nonce` are first signed by coinbase key producing
 `signature`. The `signature` is then fed into a normal nonce-based

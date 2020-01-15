@@ -1,5 +1,16 @@
 = Core Paper
-Wei Tang <hi@that.world>
+Wei Tang <@sorpaas>
+:license: Apache-2.0
 
+[meta="description"]
 Core Paper is a collection of specifications, reviews and descriptions
 of various blockchain projects.
+
+Core Paper consists of several sub-projects:
+
+* *link:https://ethereum.corepaper.org[Core Paper of Ethereum]*:
+  Ethereum-specific specifications and reviews.
+* *Core Paper of Substrate*: Substrate-specific descriptions,
+  including link:https://kulupu.network[Kulupu].
+* *Core Paper of Solri*: link:https://solri.org[Solri] family
+   blockchains.
