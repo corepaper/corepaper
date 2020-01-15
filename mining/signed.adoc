@@ -4,7 +4,7 @@ Wei Tang <@sorpaas>
 
 [meta="description"]
 This article discusses the idea of signed mining, which tries to
-provide a safe construct with a high degrees of delibration, in a
+provide a safe construct with a high degree of delibration, in a
 Proof of Work blockchain system.
 
 A good mining algorithm for a blockchain must ensure
