@@ -75,3 +75,53 @@ always tried before a block is produced. As a result, this enforces
 that mining hardwares must keep the private key together with the
 miner. Transmitting large amount of signatures through the network is
 impractical and inefficient.
+
+== Ethereum
+
+NOTE: This section describes a specification, with identifier
+*52-ESIGNED*.
+
+=== Specification
+
+Replace the `coinbase` field of block header by `r`. Add two new
+fields into the block header, `v` and `s`. Together, `v`, `r`, `s`
+hold an _secp256k1_ signature, whose public key is interpreted as the
+new coinbase address for a block.
+
+When verifying the Ethash PoW for a block, change the logic to be the
+following:
+
+* Given a header, get the hash stem:[H_1] where `v` equals
+  `CHAIN_ID`. `r`, `s` and `mixHash` equals `0`.
+* Check that stem:[H_1] is the valid preimage of the signature
+  consisting of `v`, `r` and `s`, with `v` equal to `CHAIN_ID * 2 +
+  35` or `CHAIN_ID * 2 + 36`.
+* Calculate hash stem:[H_2], with `mixHash` set to `0` in the original
+  header.
+* Check that stem:[H_2] is the valid preimage for Ethash of `mixHash`
+  and `nonce`.
+
+== Kulupu
+
+NOTE: This section describes a specification, with identifier
+*53-KSIGNED*.
+
+=== Specification
+
+Change the header seal to be of the following SCALE encoded structure:
+
+[source,rust]
+struct Seal {
+  difficulty: Difficulty,
+  nonce: H256,
+  signature: Signature,
+  work: H256,
+}
+
+Change the verification process to be as follows:
+
+* Check that `difficulty` is the valid difficulty.
+* Check that `(difficulty, nonce)` is the valid preimage of sr25519
+  `signature`, against public key provided in the pre-runtime digest.
+* Check that `(difficulty, nonce, signature)` is the valid preimage of
+  RandomX `work`.
