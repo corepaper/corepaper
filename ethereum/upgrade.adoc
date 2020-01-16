@@ -1,0 +1,114 @@
+= Feature Upgrade
+Wei Tang <@sorpaas>
+:license: Apache-2.0
+
+[meta="description"]
+Overview of feature upgrade process and related issues in Ethereum and
+Ethereum Classic.
+
+Feature upgrades in Ethereum and Ethereum Classic are usually
+conducted through *hard fork*.
+
+== Hard Fork
+
+Hard fork feature upgrade process requires all participating nodes to
+be updated. This certainly requires a lot of coordination. As a
+result, client implementors regularly gathers together and decide on
+the next hard fork. A regular hard fork process contains the following
+steps:
+
+* Writers propose specifications to be included in a hard
+  fork. Developers review those specifications and give feedbacks.
+* Developers vet on specifications to be included. Then, everyone
+  agrees on an accepted list.
+* Developers go on to implement those new features in clients. In the
+  mean time, testing starts.
+* Developers decide on a testnet hard fork block number.
+* If the testnet hard fork goes well, developers decide on a mainnet
+  hard fork block number.
+* Finally, announce and ask miners, exchanges and users to upgrade.
+
+Ethereum is currently adopting a new
+link:https://ethereum-magicians.org/t/eip-centric-forking/3536[EIP-centric
+hard fork process].
+
+Surprisingly, in Ethereum, a hard fork is usually decided on a *date*,
+then predice a *block number*, which then gets written into
+clients. This has created complications because block time varies, and
+thus it makes the block number hard to predict. A proposal to fix this
+is to use block's timestamp as the factor for hard fork. However, the
+proposal received push-back from core developers, citing it may be
+over-engineering, and block timestamp might be gamed by miners.
+
+For controversial features, the hard fork process had used
+*signaling*.
+
+== Soft Fork
+
+Soft fork is a feature upgrade process that does not require all nodes
+to be updated. This is done by making upgraded nodes execute on a more
+restrictive set of state transition function than non-upgraded
+nodes. As long as the upgraded nodes are the majority, new applied
+restrictions will be followed.
+
+Soft fork usually must require *signaling*. We need majority of
+upgraded nodes before the soft fork features are applied, in order to
+ensure non-upgraded nodes follow the same chain head. What's more, due
+to the turing-complete nature of EVM, many restrictions related to
+state (for example, blacklisting accounts) cannot be implemented as
+soft forks. Otherwise, denial of service attacks will be possible.
+
+== Signaling
+
+Signaling allows everyone who participate in the coin to vote on
+whether a particular feature upgrade should happen.
+
+=== Carbon Voting Process
+
+Carbon vote allows coin holders to signal their preferences. One coin,
+one vote. Non-enforced carbon vote had happened in the past. The first
+notable event was the DAO hack. Coin holders used carbon vote to
+signal whether they support an irregular state transition from the
+hackers. The second notable one was the Parity multi-sig hack. Coin
+holders again used carbon vote to signal whether they support unfreeze
+the affected contracts.
+
+Specifications for enforced carbon vote proposals have also been
+writte, such as
+link:https://specs.that.world/28-carbonvote/[28-CARBONVOTE].
+
+=== Miner Voting Process
+
+*Proposals: link:https://specs.that.world/27-minervote/[27-MINERVOTE],
+link:https://ecips.ethereumclassic.org/ECIPs/ecip-1022[ECIP-1022],
+link:https://ecips.ethereumclassic.org/ECIPs/ecip-1076[ECIP-1076]*
+
+Miner vote allows miners to use their mining power to signal their
+preferences. One hash, one vote.
+
+A block has an extra data field, which allows miners to insert
+anything they want, in a limited length. This is usually how most
+miner vote process happens. 
+
+Informal miner vote just requires miners to configure their software
+so that the extra data is written in a particular pattern, for
+example, with a prefix or postfix, and then manually count them. This
+happened in Ethereum with the ProgPoW signaling. In Ethereum Classic,
+a proposal ECIP-1076 is also created to allow miners to signal on
+mining algorithm changes, mostly SHA-3.
+
+Formal miner vote takes the voting process more seriously, and
+optionally bind it to an actual upgrade process. Once enough miners
+signal support, an upgrade will happen automatically. Those are
+processes such as 27-MINERVOTE and ECIP-1022.
+
+=== Generalized Voting Process
+
+*Proposals: link:https://specs.that.world/36-statevote/[36-STATEVOTE]*
+
+Because Ethereum support turing-complete smart contracts, carbon and
+miner voting process can be generalized and unified. A proposal,
+36-STATEVOTE, is designed for this. With minimal performance and
+backward compatibility overhead, any type of voting, be it carbon
+vote, miner vote, or a DAO style vote, can be applied with this
+framework.

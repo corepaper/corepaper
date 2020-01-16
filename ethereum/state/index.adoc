@@ -1,0 +1,11 @@
+= State Growth
+Wei Tang <@sorpaas>
+:license: Apache-2.0
+
+[meta="description"]
+State growth, storage rent, stateless client and other related issues.
+
+The size of the state for Ethereum and Ethereum Classic has been
+constantly growing. In Ethereum, the archive node grows nearly to a
+point that a normal hard disk cannot store the full state. We discuss
+issues related to state growth in this section.

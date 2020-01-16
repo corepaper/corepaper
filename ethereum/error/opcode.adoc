@@ -1,0 +1,104 @@
+= Opcode-specific Error Handling
+Wei Tang <@sorpaas>
+:license: Apache-2.0
+
+[meta="description"]
+Issues and fixes for opcode specific error handling.
+
+EVM and its feature upgrades are designed and developed by different
+people, with different understanding of how the system
+works. Overtime, inconsistencies in error handling appear. They create
+confusions for implementors. As a result, when account versioning is
+deployed, it may also be good to fix those inconsistencies once and
+for all.
+
+## Check Arithmetic Overflow
+
+*Proposals: https://eips.ethereum.org/EIPS/eip-1051[EIP-1051]*
+
+This cleans up the long-standing issue that arithmetic opcodes in EVM
+silently warps when overflowing. This has turned out to be a security
+issue, with known exploit happened in the past.
+
+== Consistent Copy-to-memory Behavior
+
+NOTE: This section describes a specification, with identifier
+https://specs.corepaper.org/47-cpym[47-CPYM].
+(https://specs.corepaper.org/47-cpym/discuss[Discuss])
+
+Some opcodes requires copying data into EVM memory. Overtime,
+inconsistent behavior appears. Some opcodes will panic if the offset
+of the data is out of range, while some other opcodes will silently
+assume that the data is zero. This specification attempts to make it
+consistent, by changing all opcodes to panic.
+
+=== Specification
+
+Change the behavior of the following opcodes:
+
+* In `CALLDATALOAD`, if `stack(0) + 32` overflows or is greater than
+  the length of call data, return unrecoverable error.
+* In `CALLDATACOPY`, if `stack(1) + stack(2)` overflows or is greater
+  than the legnth of call data, return unrecoverable error.
+* In `CODECOPY`, if `stack(1) + stack(2)` overflows or is greater than
+  the length of code, return unrecoverable error.
+* In `EXTCODECOPY`, if `stack(2) + stack(3)` overflows or is greater
+  than the legnth of external code, return unrecoverable error.
+
+=== Interactions
+
+This assumes that we have a *forward-compatible EVM* that is deployed
+to support *unrecoverable error*, such as
+https://specs.corepaper.org/39-ungas[39-UNGAS].
+
+=== Discussions
+
+This specification does not change the behavior of `CALL`, `CALLCODE`,
+`DELEGATECALL` and `STATICCALL`, which copy data from return data
+buffer to memory. It has a specific behavior that the length copied is
+`min(stack(out_len), buffer_len)`.
+
+== Explicit Memory Growth
+
+NOTE: This section describes a specification, with identifier
+https://specs.corepaper.org/48-growm[48-GROWM].
+(https://specs.corepaper.org/48-growm/discuss[Discuss])
+
+Current EVM silently grows memory, whenever a higher region is
+accessed. While this design does not have apparent downside, it
+slightly complicates analysis of a program and implementation of EVM,
+in that the total memory used is implict. In this specification, we
+explore ways to use new opcodes `GROWMEMORY` to make memory growth
+explicit.
+
+=== Specification
+
+Add opcode `GROWMEMORY` (`0xfd`). It pops one item `target` from the
+stack. The instruction charges `G_BASE` and then sets the total
+available memory size to `target`. It then charge gas cost according
+to current rules for memory cost. If `target` is smaller than the
+current memory size, the instuction will shrink the memory, but will
+not refund any gas. If the gas cost charge fails, return out-of-gas
+error.
+
+Remove checks and charges of memory gas for the following opcodes.
+Add an additional check for each of them in relation with current
+memory size, and return unrecoverable error if the check fails.
+
+* For `SHA3`, `RETURN`, `REVERT`, `LOG`, check `stack(0) + stack(1)
+  <= memory_len`.
+* For `CODECOPY`, `CALLDATACOPY`, `RETURNDATACOPY`, check `stack(0) +
+  stack(2) <= memory_len`.
+* For `EXTCODECOPY`, check `stack(1) + stack(3) <= memory_len`.
+* For `MLOAD`, `MSTORE`, check `stack(0) + 32 <= memory_len`.
+* For `MSTORE8`, check `stack(0) + 1 <= memory_len`.
+* For `CREATE`, `CREATE2`, check `stack(1) + stack(2) <= memory_len`.
+* For `CALL`, `CALLCODE`, check `stack(3) + stack(4) <= memory_len`
+  and `stack(5) + stack(6) <= memory_len`.
+* For `DELEGATECALL`, `STATICCALL`, check `stack(2) + stack(3) <=
+  memory_len` and `stack(5) + stack(6) <= memory_len`.
+
+=== Interaction
+
+Note that after https://specs.corepaper.org/39-ungas[39-UNGAS],
+out-of-gas error will be an unrecoverable error.

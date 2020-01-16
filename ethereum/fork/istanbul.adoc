@@ -1,0 +1,174 @@
+= Istanbul and Aztlan Hard Fork
+Wei Tang <@sorpaas>
+:license: Apache-2.0
+
+[meta="description"]
+Istanbul hard fork on Ethereum and Aztlan hard fork on Ethereum
+Classic.
+
+Istanbul feature upgrade contains the following specifications:
+
+* https://eips.ethereum.org/EIPS/eip-152[EIP-152]: Add Blake2
+  compression function `F` precompile
+* https://eips.ethereum.org/EIPS/eip-1108[EIP-1108]: Reduce
+  alt_bn128 precompile gas costs
+* https://eips.ethereum.org/EIPS/eip-1344[EIP-1344]: Add ChainID
+  opcode
+* https://eips.ethereum.org/EIPS/eip-1884[EIP-1884]: Repricing for
+  trie-size-dependent opcodes
+* https://eips.ethereum.org/EIPS/eip-2028[EIP-2028]: Calldata gas
+  cost reduction
+* https://eips.ethereum.org/EIPS/eip-2200[EIP-2200]: Rebalance
+  net-metered SSTORE gas cost with consideration of SLOAD gas cost
+  change
+
+== Ethereum
+
+The Ethereum upgrade applied the full Istanbul feature upgrade
+set. Several *considerations* were mentioned during this feature
+upgrade set review:
+
+* ***Consideration* on Blake2 precompile parameters.** It was under
+  debate whether the `round` parameter would be useful, or would be
+  following the hashing algorithm's specification. It is later
+  concluded that this may be useful for some applications, so leaving
+  it there does no harm.
+* ***Consideration* on EIP-1884 backward incompatibility.** It is
+  known that EIP-1884 will break some on-chain contracts. See its
+  https://github.com/holiman/eip-1884-security[security review] for
+  more details.
+  
+== Ethereum Classic
+
+The Ethereum Classic upgrade is planning to apply the Istanbul feature
+upgrade set with EIP-1884 stripped, and it has a separate code-name
+called **Aztlan (Yingchun)**. 
+
+=== Reviews
+
+We gathered one review of *consideration*, and two categorized as
+*design failure*.
+
+==== Trie Access Underprice
+
+*Consideration*
+
+It is known that the reason to apply EIP-1884 on Ethereum is to fix a
+potential vulnerability related to trie access underprice. The
+decision not to apply EIP-1884 on Ethereum Classic effectively leaves
+the vulnerability open. While we don't disclose the exact method for
+the effective attack here in order to protect public interest, you can
+read https://arxiv.org/abs/1909.07220[this paper] to learn about
+backgrounds of the attack.
+
+==== Incompatibility with Ethereum
+
+*Design Failure*
+
+In Aztlan, interoperatibility with Ethereum is listed as one of the
+primary goal of this hard fork. Unfortunately, due to a design failure
+overlooked in the specification, it accomplishes the exact opposite.
+
+This is primarily due to the new `SELFBALANCE` opcode included in
+EIP-1884. Aztlan stripped EIP-1884 due to backward compatibility
+reasons. However, by doing this, it also stripped `SELFBALANCE`. Not
+including this opcode means that any smart contracts compiled using
+Solidity or Vyper, using the Istanbul hard fork configuration, will
+not be able to function correctly on Ethereum Classic Aztlan. Those
+who wish to compile to Ethereum Classic must continue to use
+Constantinople or Byzantium hard fork configuration, and as a result,
+cannot take advantage of any Istanbul features.
+
+**Recommendation**: Create a specification that applies `SELFBALANCE`
+opcode standalone, and add it to the hard fork specification list.
+
+==== Inconsistency in Net Gas Metering
+
+*Design Failure*
+
+Aztlan decided to include EIP-2200 for `SSTORE` net gas
+metering. However, it did not thoroughly consider the facts that
+EIP-2200 is designed with the full context of Istanbul hard fork,
+whose pre-conditions that Aztlan does not fulfill.
+
+Net gas metering has a family of EIP specifications, including
+EIP-1283, EIP-1706 and EIP-2200. The specifications contain a
+parameter of "dirty gas", which is charged when a storage value has
+already been modified in the same transaction context. This value, as
+in the design intention, is expected to always equal to the value of
+`SLOAD` gas cost. In EIP-2200, this "dirty gas" is set to be `800`, so
+as to accommodate EIP-1884's gas cost change of `SLOAD` from `200` to
+`800`. However, Aztlan does not include EIP-1884 but only applied
+EIP-2200, resulting in inconsistency in the EIP design intention, and
+may lead to unknown gas cost issues.
+
+This has also led to confusions in implementations. For example, a
+contributor previously
+https://github.com/paritytech/parity-ethereum/pull/11338[merged] an
+incorrect version of Aztlan hard fork into Parity Ethereum. This, if
+left unspotted, will lead to consensus split on the whole Ethereum
+Classic network.
+
+**Recommendation**: Remove EIP-2200 from the applied specification
+list, and add EIP-1283 with EIP-1706 instead.
+
+=== Fixes
+
+In this section, we provide several specifications to address
+currently known review issues.
+
+==== Standalone Self Balance
+
+NOTE: This section describes a specification, with identifier
+https://specs.corepaper.org/50-selfbalance[50-SELFBALANCE].
+(https://specs.corepaper.org/50-selfbalance/discuss[Discuss])
+
+This section provides a standalone specification for the `SELFBALANCE`
+opcode.
+
+===== Specification
+
+A new opcode, `SELFBALANCE` is introduced at `0x47`.
+
+* `SELFBALANCE` pops 0 arguments off the stack,
+* `SELFBALANCE` pushes the balance of the current address to the
+  stack,
+* `SELFBALANCE` is priced as GasFastStep, at 5 gas.
+
+==== Aztlan Fix
+
+NOTE: This section describes a specification, with identifier
+https://specs.corepaper.org/49-aztlanfix[49-AZTLANFIX].
+(https://specs.corepaper.org/49-aztlanfix/discuss[Discuss])
+
+This provides a specification as a "fix" to the current Aztlan hard
+fork. That is, it can be applied after Aztlan to fix the current
+problems.
+
+===== Specification
+
+After `HARD_FORK_BLOCK`, apply the following changes:
+
+* Disable EIP-2200, and enable EIP-1283 with EIP-1706.
+* Enable https://specs.corepaper.org/50-selfbalance[50-SELFBALANCE].
+
+==== Aztlan Redo
+
+NOTE: This section describes a specification, with identifier
+https://specs.corepaper.org/51-aztlanredo[51-AZTLANREDO].
+(https://specs.corepaper.org/51-aztlanredo/discuss[Discuss])
+
+This provides a specification that "redo" Aztlan hard fork. This
+assumes that Aztlan will not go through, and a new specification will
+take its place.
+
+===== Specification
+
+After `HARD_FORK_BLOCK`, apply the following changes.
+
+* Enable https://eips.ethereum.org/EIPS/eip-152[EIP-152],
+  https://eips.ethereum.org/EIPS/eip-1108[EIP-1108],
+  https://eips.ethereum.org/EIPS/eip-1344[EIP-1344] and
+  https://eips.ethereum.org/EIPS/eip-2028[EIP-2028].
+* Enable EIP-1283 with EIP-1706.
+* Enable https://specs.corepaper.org/50-selfbalance[50-SELFBALANCE].

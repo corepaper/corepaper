@@ -1,0 +1,26 @@
+= Hard Fork
+Wei Tang <@sorpaas>
+:license: Apache-2.0
+
+[meta="description"]
+Overviews and reviews of hard forks happened on Ethereum and Ethereum
+Classic.
+
+This section documents reviews and concerns of Ethereum and Ethereum
+Classic hard forks. Specific issues related to each hard fork are
+discussed. Issues are categorized as follows:
+
+* **Consideration**: A specific design decision that has drawbacks
+  causing problems such as added complexity, backward incompatibility,
+  and more. The decision has been reviewed during the hard fork
+  process, and there are no clear alternatives that are better, or all
+  alternatives have other drawbacks.
+* **Design Failure**: A specific design decision that is
+  under-reviewed, and an alternative could have been adopted that is
+  significantly better.
+* **Fatal**: A specific design decision that can cause security issues
+  for the blockchain.
+
+Contributions are welcome. If you have specific comments of a hard
+fork, please feel free to submit a PR to the
+https://github.com/corepaper/ethereum[corepaper/ethereum] repository.

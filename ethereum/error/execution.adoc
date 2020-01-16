@@ -1,0 +1,87 @@
+= Execution Frame Error Handling
+Wei Tang <@sorpaas>
+:license: Apache-2.0
+
+[meta="description"]
+Design a better and simplified error handling model for Ethereum.
+
+In current EVM, codes are ran in execution frames. When an execution
+frame returns, it will return one of the following status to the
+parent:
+
+* **Succeed**: The execution is successful.
+* **Reverted**: The execution has terminated due to an explicit
+  `REVERT` opcode. All state changes are reverted, while the remaining
+  gases are refunded.
+* **Failed**: The execution has terminated due to an "out-of-gas"
+  error. All state changes are reverted, and the remaining gases will
+  not be refunded.
+* **Not Supported**: Fatal EVM execution error that cannot be handled,
+  usually due to attempts of creating memory region larger than the
+  virtual machine can support. This is not expected to happen in a
+  blockchain context.
+
+Both *Reverted* and *Failed* are called **Errors** in EVM, and
+currently both of them are recoverable, in that they can be inspected
+by the parent execution frame, if there is any.
+
+The current error handling semantics have several issues:
+
+* **It makes gas cost observable as a side effect.** To design a
+  forward-compatible EVM and fix current backward compatibility
+  issues, one of the important feature change needed is to make gas
+  cost not observable. However, by observing the status of contracts
+  executed in sub-execution frame (for example, contracts that only
+  have one single opcode), the caller can derive the current gas cost
+  schedule.
+* **It complicates the threat model of smart contract developers.**
+  There are so many ways a contract can fail. It may be opcode
+  parameter restrictions, out-of-bound memory access, actually running
+  out-of-gas, or other subtle EVM execution details. This makes the
+  threat model for smart contracts complicated.
+
+== Fatal Error as Default
+
+*Proposals: https://specs.corepaper.org/39-ungas[39-UNGAS]*
+
+The intention of this specification is so that we mark errors default
+as unrecoverable. This significantly simplifies the threat model of
+smart contract developers. It makes the only way to return a
+recoverable error through an explicit `REVERT`. The complete
+specification of this is described as part of
+<<../compatibility/forward.adoc#,Forward-compatible EVM>>.
+
+== Explicit Checkpointing
+
+NOTE: This section describes a specification, with identifier
+https://specs.corepaper.org/46-checkpoint[46-CHECKPOINT].
+(https://specs.corepaper.org/46-checkpoint/discuss[Discuss])
+
+One of the overhead for running EVM is that checkpointing is always
+required for all execution frame invocations. This is the case because
+we still have recoverable errors. If, instead, the concept of
+recoverable error is dropped, and all errors are just fatal, we can
+remove all implicit checkpointing, which may speed up EVM execution.
+
+In this case, contracts which still need to do checkpointing can do so
+explicitly, using two new opcodes `CHECKPOINT` and `REVERTPOINT`.
+
+=== Specification
+
+Define two new opcodes:
+
+* `CHECKPOINT` at `0xfc`.
+* `REVERTPOINT` at `0xfd`.
+
+Add a new data structure item `checkpoints` to EVM, in execution frame
+level. `CHECKPOINT` creates a new checkpoint for current execution
+frame, and `REVERTPOINT` reverts the last checkpoint. Define constant
+`CHECKPOINT_LIMIT` as the limit of checkpoints an execution frame can
+create. If `CHECKPOINT` results in checkpointing length greater than
+`CHECKPOINT_LIMIT` or if `REVERTPOINT` operates on empty checkpointing
+stack, return fatal error.
+
+=== Interaction
+
+While this specification can be applied standalone, it's usually only
+useful when recoverable errors are eliminated from the EVM.

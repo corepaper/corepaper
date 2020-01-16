@@ -1,0 +1,155 @@
+= State Growth and GasToken Smart Contract
+Wei Tang <@sorpaas>
+:license: Apache-2.0
+
+[meta="description"]
+Analysis of the state growth issue caused by GasToken smart contract,
+in Ethereum Classic network.
+
+NOTE: This section has a https://github.com/corepaper/ethereum/issues/4[discussion
+link].
+
+Recently, a contract called https://gastoken.io/[GasToken] has
+spiked in usage on Ethereum Classic network, causing the state size to
+grow several GBs per day. Community members have been trying to
+propose solutions to fix the issue or at least to slow down the
+growth. This article provides some reviews and feedbacks on those
+proposed solutions.
+
+== Reduce Block Gas Limit
+
+*Proposals:
+https://ecips.ethereumclassic.org/ECIPs/ecip-1047[ECIP-1047]*
+
+The major issue of contracts like GasToken is that it causes fast
+state size growth. One of the simplest method to limit state size
+growth is to simply reduce the block gas limit. With less state access
+opcodes able to execute at each block, less data can be added into the
+state, and thus slower state growth.
+
+However, the counterintuitive but unpleasant fact is, when the limit
+is decreased, miners may be more incentivzed to mine GasToken. The
+reason for this is that as the block size decreases, people will
+expect an increase in gas price shortly after. This is exactly the
+situation GasToken takes advantage of. As a result, user experiences
+in the beginning will be worse, because we can expect a larger portion
+of the block to be filled with GasToken transactions, and users will
+have to pay higher gas price to get their non-GasToken transactions
+through.
+
+== Remove Gas Refund
+
+GasToken takes advantage of the EVM mechanic of gas refund. As a
+result, some community members started to talk about removing the gas
+refund mechanic so as to break GasToken contract, halting the state
+growth. Reviewing this method, we find it genuinely breaking more
+things than accomplishing the goal.
+
+Gas refund does not fundamentally contribute to the issue of state
+growth. The actual issue of state growth is due to opcodes' utilities,
+rated at their *absolute costs*. While gas refund mechanic is a part
+of the calculation for *absolute costs*, it is not the source. In
+addition, we note that gas refund provides incentive for clearing
+state. If we remove gas refund without other accomodating changes, it
+will also leave abnormality in the *absolute costs*. What's more,
+GasToken contracts' utility of "save gas now, spend it later" can be
+fulfilled by specialized smart contracts without using the gas refund
+mechanic.
+
+=== The Mechanic
+
+Gas refund is a way to remove gas cost for an operation. It presents
+on two opcodes:
+
+* `SSTORE`: Refund 15000 gas, if a storage value is reset.
+* `SELFDESTRUCT`: Refund 24000 gas, if a contract is destructed.
+
+The refund happens when value is reset, or contract is
+destructed. However, note that before a value is reset, it must be set
+first, and before a contract is destructed, it must be created
+first. As a result, the full cycle of gas refund goes as follows:
+
+* **Set-reset cycle**: if a storage value is set, charge 20000 gas. If
+  a storage value is reset, charge 5000 gas and refund 15000 gas.
+* **Create-destruct cycle**: if a contract is created, charge 32000
+  gas (together with possible init code execution and deployment
+  gas). If a contract is destructed, refund 24000 gas.
+  
+From above, we can see that:
+
+* In *set-reset cycle*, when setting a storage value, it has an
+  *absolute cost* of at least 10000 gas. The cost will be 10000 more
+  if the value is not reset.
+* In *create-destruct cycle*, when creating a contract, it has an
+  *absolute cost* of at least 8000 gas. The cost will be 24000 more if
+  the contract is not later destructed.
+  
+=== Absolute Cost
+
+This allows us to draw the absolute cost table:
+
+[options="header"]
+|===
+| Operation               | Absolute Gas Cost |
+| Set and reset           | 10000             |
+| Set but not reset       | 20000             |
+| Create and destruct     | 8000              |
+| Create but not destruct | 32000             |
+|===
+
+The absolute cost marks the actual utility of the state growth,
+relative to other opcode's gas cost. If the absolute cost is
+increased, then bloating the state will be more expensive, and thus
+slow down state growth, and vice versa.
+
+Refund is a way to incentivize resetting storage values, and
+destructing contracts, to free space in the state. The machanic
+contributes to the calculation of absolute cost table, but is not the
+source. If refund is removed, the new absolute cost table will be as
+follows:
+
+[options="header"]
+|===
+| Operation               | Absolute Gas Cost |
+| Set and reset           | 25000             |
+| Set but not reset       | 20000             |
+| Create and destruct     | 3200              |
+| Create but not destruct | 32000             |
+|===
+
+Note that because resetting storage charges an additional 5000 gas,
+not resetting the value now even has cheaper absolute gas cost
+compared with resetting the value. The gas scheme certainly becomes
+less useful without refund.
+
+Instead of removing the refund, what people might actually want is to
+increase the gas cost of state growth related opcodes. For example, if
+`SSTORE` set is increased to 30000 gas, and `CREATE` initial cost is
+increased to 56000 gas, we will have the following absolute gas cost
+table.
+
+[options="header"]
+|===
+| Operation               | Absolute Gas Cost |
+| Set and reset           | 20000             |
+| Set but not reset       | 30000             |
+| Create and destruct     | 32000             |
+| Create but not destruct | 56000             |
+|===
+
+=== Work Around Gas Refund
+
+The utility GasToken provides can be stated as follows -- spend some
+gases, you can save a portion of them now, and spend them later when
+gas price increases. This utility still preserves even when gas refund
+mechanic is removed.
+
+To provide an example, consider using the *storage value set-reset
+cycle*, we can imagine a contract, storing users' balance in a simple
+array of $index -> balance$. Whenever a new user is registered, it
+pushes a value into the end of the array. If the contract anticipates
+that the gas price will increase in the future, it can pre-allocate
+indexes now, by registering non-existant users, and setting their
+balances to a special value marked as $null$ (for example,
+`0xffff.ffff`). This does not rely on the refund mechanic, but
+accomplishes the same utility as GasToken.

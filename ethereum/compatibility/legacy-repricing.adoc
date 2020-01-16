@@ -1,0 +1,145 @@
+= Legacy Opcode Repricing
+Wei Tang <@sorpaas>
+:license: Apache-2.0
+
+[meta="description"]
+Preserving backward compatibility for opcode repricing in legacy
+version EVM.
+
+This section discusses the general approach of doing opcode gas cost
+repricing backward-compatibly, in a set up where multiple EVM versions
+exist, using methods such as account versioning.
+
+== Problem Definition
+
+Each EVM opcode has an associated gas cost. Cost of the opcode is
+deducted. It is then multiplied by a given gas price, to give out the
+actual transaction fee the caller has to pay in ether. For times, core
+developers have find that certain opcode's gas cost is too cheap, and
+it makes the chain vulnerable to attack. An attacker can execute a
+crafted transaction with vulnerable opcodes, pay a small amount of
+ether, and cause long execution time on all node implementations.
+
+The solution to those kind of problem in the past is to raise those
+vulnerable opcode's gas cost, for example, as we have done in
+https://eips.ethereum.org/EIPS/eip-150[EIP-150] and
+https://eips.ethereum.org/EIPS/eip-1884[EIP-1884]. Those type of
+raising hard forks sometimes also constitutes an *emergency hard
+fork*, because the issue must be fixed quickly, otherwise the attacker
+can halt the blockchain.
+
+In the mean time, however, it is known that changes like this brings
+in potentially serious backward compatibility issues, for example, to
+cause a number of money-owning already-deployed smart contracts to
+break. The most recent event of this is
+https://github.com/holiman/eip-1884-security[EIP-1884 security
+analysis].
+
+This is the problem this article tries to discuss and provide
+solutions for. How do we apply opcode repricing and emergency hard
+forks in a backward compatible way?
+
+== Account Versioning
+
+Account versioning is one of the most important solutions to solve
+backward compatibility issues. The following discussions about opcode
+repricing is based on that we already have account versioning
+https://specs.that.world/43-ver/[43-VER] deployed, and we have
+already enabled a forward compatible EVM:
+
+* Legacy version `0`: VM with frozen schedule of gas cost just before
+  account versioning is applied.
+* Forward-compatible version `1`: VM with
+  https://specs.corepaper.org/40-unused/[40-UNUSED],
+  https://specs.corepaper.org/39-ungas/[39-UNGAS] and optionally
+  https://eips.ethereum.org/EIPS/eip-2327[EIP-2327].
+  
+Note that any gas repricing on forward-compatible version will not
+affect backward compatibility with past contracts, as discussed in
+*Addressing Gas Issues* in <<index.adoc#,Backward Compatibility>>.
+
+Applying gas repricing directly on legacy version will cause backward
+compatibility issues, and the goal of this article is to explain a
+method to apply repricing without breaking anything.
+
+== Miners, Gas Price and Block Gas Limit
+
+Ultimately, the miner decides which transaction to be included on
+chain. Within those transactions are the EVM executions that takes
+time. A miner can tolerate a certain amount of execution time for all
+transactions in a block, for example, 1 second. If the time becomes
+longer, the miner loses time for mining, because it is still building
+the block, and thus loses rewards.
+
+Users submit transactions of certain gas price, and miners determine
+transactions of which gas price to be included in a block. The miner
+ultimately will decide on a **safe gas price** `P`, where it would
+require all transactions to be above this value, and it can also raise
+or fall the block gas limit `L_b`, based on a **safe block gas limit**
+`L`.
+
+We can roughly know that `P * L` is roughly the actual computation
+cost (in ether), where the value is roughly a constant at any given
+point of time. The computation time to execute `L` will be roughly the
+tolerable time to execute the block.
+
+== Relativity of Gas Cost
+
+If we double, triple, or reduce it by half of all gas cost functions,
+the functionality does not change. For example, when we change all gas
+cost functions to be `1/2` of what it previously is, if a transaction
+previously consumes gas cost `g`, it now always consumes `1/2 * g`. In
+the mean time, the *safe gas price* for a miner in the network will be
+raised to `2P`, because now *safe block gas limit* for a rational
+miner becomes `1/2 * L`, and *safe gas price* times *safe block gas
+limit*, which constitutes the actual cost in ether, does not change.
+
+In other words, what is important for an opcode's gas cost is how it
+is relative to other opcode's. The absolute value of the gas cost does
+not affect functionality.
+
+== Conducting Gas Repricing
+
+With the above, in this section we discuss how the actual gas
+repricing happens. The procedure is roughly like follows, considering
+we have two account versions (legacy version `0`, and
+forward-compatible version `1`).
+
+1. For the vulnerable opcode, decide on the factor of increase `F`, so
+   that the new gas cost becomes `g * F`, if the previous cost is `g`.
+2. Design and apply a schedule for the forward-compatible version,
+   instead of increasing gas cost of the vulnerable opcode, decrease
+   all other opcode's gas cost by factor `1/F`.
+   
+We're done! Now, miner's *safe block gas limit* will be reduced by
+factor `1/F`, and *safe gas price* will be increased by factor `F`. A
+hard reset of block gas limit can also be done together with the hard
+fork. Note that we did no change in legacy version, and as a result it
+is backward compatible.
+
+* In forward-compatible EVM, any exploit is fixed, because the
+  relativity of gas cost, decreasing other opcode's gas cost is
+  equivalent to increasing the vulnerable opcode's gas cost.
+* In legacy EVM, vulnerable opcode's gas cost equal to the
+  forward-compatible EVM, while other opcode gas cost is more
+  expensive compared with the forward-compatible EVM. The gas config
+  becomes in all cases more expensive compared with forward-compatible
+  EVM. The exploit is also fixed.
+  
+By not changing the legacy version, it is backward compatible. By the
+effect on gas price and gas limit, the vulnerability is fixed in the
+legacy version.
+
+== Discussions
+
+=== Complexity of Decreasing Gas Cost
+
+The method discussed above involves some complexity, mostly due to the
+systematic decrease of gas cost. The complexity can be reduced by not
+actually decreasing gas cost, but introduce a new parameter in the EVM
+as the factor `F` for decrement.
+
+* When entering a call frame, instead of setting the gas counter as
+  gas provided `g`, set it to `g * F`.
+* When returning results for GAS opcode, return `g / F`.
+* In CALL-like or CREATE-like opcode, provide gas as if it is `g / F`.

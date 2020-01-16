@@ -1,0 +1,106 @@
+= Mining Algorithms
+Wei Tang <@sorpaas>
+:license: Apache-2.0
+
+[meta="description"]
+Switching mining algorithms and related issues.
+
+In this section, we discuss mining algorithms. In particular,
+switching mining algorithms. In both Ethereum and Ethereum Classic,
+there have been various proposals to change the currently used mining
+algorithm, ethash, to something else. We first discuss some of the
+proposals, and then discuss some general issues in switching
+algorithms.
+
+== Switching Algorithms
+
+Many proposals have been made to switch the currently used mining
+algorithms.
+
+=== Tweaking Ethash
+
+Those set of proposals focus on doing small tweaks on Ethash, but
+still maintain most of the original algorithm design.
+
+==== For ASIC Resistance
+
+*Proposals: link:https://eips.ethereum.org/EIPS/eip-1355[EIP-1355],
+link:https://eips.ethereum.org/EIPS/eip-1485[EIP-1485]*
+
+Ethash was originally designed to be ASIC resistant. However, it's
+currently known that Ethash ASICs have been made. As a result,
+proposals to do slight tweaks on Ethash, to obsolete current ASICs,
+have been made. Those proposals usually only change a small part of
+the current specifications, thus can claim to be low risk.
+
+However, criticism says that current ASICs can easily adopt those new
+algorithm changes.
+
+==== For Hardware Inclusion
+
+*Proposals:
+ link:https://ecips.ethereumclassic.org/ECIPs/ecip-1043[ECIP-1043]*
+
+This proposal limits the DAG size. Originally, DAG size growth is to
+provide ASIC resistance. However, it's currently growing over the
+range where many commonly used GPUs will not be able to mine.
+
+=== ProgPoW
+
+*Proposals: link:https://eips.ethereum.org/EIPS/eip-1057[EIP-1057]*
+
+ProgPoW is an overhaul of Ethash that aims at providing better
+utilization of GPUs, and as a result, keeps the original promise of
+being ASIC resistant.
+
+=== Keccak256
+
+*Proposals:
+ link:https://ecips.ethereumclassic.org/ECIPs/ecip-1049[ECIP-1049]*
+
+Another group of people think ASIC resistance is impossible, and maybe
+even harmful to accomplish. The proposal, ECIP-1049, switches to an
+ASIC friendly algorithm Keccak256.
+
+== Difficulty Bomb
+
+*Proposals: link:https://eips.ethereum.org/EIPS/eip-649[EIP-649],
+link:https://eips.ethereum.org/EIPS/eip-1234[EIP-1234],
+link:https://ecips.ethereumclassic.org/ECIPs/ecip-1010[ECIP-1010],
+link:https://ecips.ethereumclassic.org/ECIPs/ecip-1041[ECIP-1041]*
+
+Difficulty bomb is a mechanic added as
+link:https://blog.ethereum.org/2015/08/04/ethereum-protocol-update-1/[the
+first hard fork on Ethereum], aiming at removing "not doing anything"
+as the default choice for hard fork.
+
+Ethereum Classic has delayed the difficulty bomb once, and finally
+ended up removing it. Ethereum has delayed the difficulty bomb twice,
+and is still counting today.
+
+== Issues in Signaling
+
+Switching mining algorithms is usually a controversial topic. As a
+result, some form of signaling is required. The most commonly adopted
+method is miner vote -- allow miners to vote on the change, with one
+hash, one vote. The issue with this design, however, is that it gives
+the unchanged algorithm an disproportional advantage -- all votes are
+casted using the unchanged mining algorithm, while we are deciding to
+switch to a new mining algorithm!
+
+Methods to fix this issue includes:
+
+* Doing a soft fork to make the coin dual mining, and gradually
+  decrease the original algorithm's difficulty.
+* Use other methods of voting, such as carbon vote, or do not do any
+  form of signaling at all.
+
+== Issues in Difficulty Adjustment
+
+Difficulty of different mining algorithms are not comparable, because
+the time to calculate one hash of different algorithms in commodity
+hardware is different. As a result, when switching mining algorithms,
+major difficulty surge or spike is expected. Developers must be aware
+of this issue -- either design the difficulty adjustment so that it
+adopts fast and unstable period is short, or preset a new difficulty
+when the new mining algorithm kicks in.

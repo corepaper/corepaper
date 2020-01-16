@@ -1,0 +1,6 @@
+= Error Handling
+Wei Tang <@sorpaas>
+:license: Apache-2.0
+
+[meta="description"]
+Error handling issues in Ethereum.

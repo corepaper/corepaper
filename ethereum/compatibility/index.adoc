@@ -1,0 +1,237 @@
+= Backward Compatibility
+Wei Tang <@sorpaas>
+:license: Apache-2.0
+
+[meta="description"]
+Overview of backward compatibility issues in Ethereum and Ethereum
+Classic.
+
+In this section, we discuss the issue of backward compatibility. We
+first give an overview of the definition, the issue behind the
+definition, and then go on to discuss various proposals.
+
+== Definition and Spectrum
+
+In the context of Ethereum, backward compatibility means that when new
+feature upgrades or hard forks are deployed, existing on-chain smart
+contracts should not break. This seems like an easy enough
+definition. However, there are many subtle ways a contract can be
+broken.
+
+* **Transaction inclusion issue**: a smart contract may have a
+  function that takes a relatively high amount of gas to finish
+  execution. However, the block gas limit may change to a value lower
+  than the gas required. This can either be due to miners voting down
+  the gas limit, or a hard cap being introduced in a hard fork.
+* **Unused opcode issue**: a smart contract may have made some
+  assumptions about an unused opcodes, intentionally or
+  unintentionally. When a new opcode is introduced and changes a
+  previously unused opcode's meaning, the contract can be broken.
+* **Compiler and contract specific gas limit issue**: a hard fork may
+  change gas costs of certain opcodes. The Solidity compiler or the
+  smart contract may have some fixed hard-coded gas limit, for
+  example, gas stipend. Previous assumptions about those fixed gas
+  limit does not hold any more, either causing vulnerabilities
+  (re-entry attack) or freezing the contract.
+* **EVM structural change issue**: structural changes such as removal
+  of opcodes, or control flow modification, may change semantics of
+  EVM and completely break a set of contracts.
+
+It is generally agreed that *transaction inclusion issue* is something
+that discussions about backward compaibility can safely ignore,
+because unless a hard cap is introcued, gas limit can be changed back,
+and it's ultimately miners' decisions whether to include a transaction
+or not. *Unused opcode* issue is slightly controversial in whether it
+should be addressed. The usual argument supporting ignoring this issue
+is that we already have a designated invalid opcode. However, it is
+only a convention, and we do have proposals that enforce this
+convention on-chain.
+
+Backward compaibility of *compiler and contract specific gas limit
+issue* and *EVM structural change issue* are things that people
+generally agreed should be addressed. The only slight controversial
+point is when we should address *compiler and contract specific gas
+limit issue* now. Some argued that because Ethereum is still an
+experiment, we can still afford breaking smart contracts and move on,
+while others argued that the issue should be addressed now.
+
+== Account Versioning
+
+Account versioning is the primary and fundamental way to address
+backward compatibility issues. Multiple account versioning proposals
+exist, but in essence, they try to do one simple thing -- associate
+all on-chain smart contracts with version numbers. With this version
+number, we can enable different EVM rules when executing code under
+different version numbers, and thus ensure backward compatibility.
+
+=== Code Prefix
+
+*Proposals: https://specs.that.world/26-ver/[26-VER],
+https://github.com/ethereum/EIPs/issues/154[EIP-154],
+https://github.com/ethereum/EIPs/pull/1707[EIP-1707]*
+
+The earliest attempt to do versioning is through code prefix. This is,
+basically, prefix bytes when deploying code on-chain. When decoding
+on-chain code, if we encounter a particular prefix, then we assume a
+code has a particular version number.
+
+This proposal is really simple to implement. However, the issue is
+that people can deploy smart contracts of legacy version, which
+accidentally or intentionally have the code prefix. If a validation
+process is added together with a code prefix, then that validation
+process can be bypassed completely, thus creating security issues.
+
+### RLP Fields
+
+*Proposals: https://specs.that.world/43-ver/[43-VER],
+https://eips.ethereum.org/EIPS/eip-1702[EIP-1702],
+https://ecips.ethereumclassic.org/ECIPs/ecip-1040[ECIP-1040]*
+
+The most accepted variation of account versioning is probably through
+RLP field. In Ethereum, account state are stored using a mapping from
+an address to account data. Account data currently contains 4 RLP
+fields -- nonce, balance, code hash and storage root. The proposal
+adds an additional version field, so that the account data has 5 RLP
+fields.
+
+The original concern for using RLP field is that implementation-wise
+it may require many engineering efforts. However, it turned out that
+changing account data RLP fields is a relatively simple change, with
+around 200 LOC change in Parity Ethereum. Currently, major clients
+like Geth, Parity Ethereum and Besu all have basic account versioning
+support of this variation.
+
+=== Special contract
+
+*Proposals: https://specs.that.world/46-ver/[46-VER]*
+
+The final variation of account versioning is to store the account
+version in a designated smart contract's storage field. Before
+accessing a contract, we fetch the corresponding storage field from
+the special contract's storage, and use that as the version number.
+
+This requires slightly less engineering efforts to carry out compared
+with account versioning using RLP fields. However, the drawback of
+this variation lies in performance -- after the change, all contract
+state access must have one additional trie access to the special
+contract, in order to fetch the version.
+
+=== Considerations on Contract Creations
+
+*Proposals: https://specs.that.world/44-vertxn/[44-VERTXN],
+https://specs.that.world/45-verop/[45-VEROP],
+https://specs.that.world/46-ver/[46-VER]*
+
+An issue related to account versioning is that when doing contract
+creations, either through `CREATE` opcodes, or through contract
+creation transactions, how do we determine the new contract's
+version. For versioning through code prefix, because the prefix always
+exists, thus we can always fetch that and use it as the version. 
+
+For versioning through RLP fields and special contract, we can by
+default make the created contract to have the same version as parent
+contract, or to always be the latest version. Extensions like
+44-VERTXN, 45-VEROP, and `VCREATE` exists to allow additional
+information to be passed for version in contract creation process.
+
+== Forward Compatibility
+
+Account versioning solves most of the backward compatibility
+issues. However, with account versioning alone, we will require too
+much engineering efforts.
+
+=== EVM Forward Compatibility
+
+The Ethereum and Ethereum Classic hard fork schedule is usually every
+6 months. If we adopt account versioning alone, we will need to
+introduce a new version every 6 months, which is not really
+sustainable. Proposals to address this issue have been proposed, to
+make the EVM forward-compatible. See [Forward-compatible
+EVM](./forward.md) for more discussions on this issue.
+
+=== Solidity Postfix
+
+*Proposals: https://eips.ethereum.org/EIPS/eip-2327[EIP-2327]*
+
+Currently, Solidity compiler will put a postfix of a compiler metadata
+at the end of a contract, during every contract deployment. Solidity
+compiler thinks that it's posting data, but it's interpreted on-chain
+as code. As a result, when unused opcodes are disabled, it will break
+this workflow of Solidity.
+
+Proposals such as EIP-2327 exist to fix this issue, by adding a new
+`BEGINDATA` opcode. Everything after the opcode is strictly considered
+to be data.
+
+=== Deployment
+
+*Proposals:
+https://ecips.ethereumclassic.org/ECIPs/ecip-1065[ECIP-1065],
+https://github.com/ethereum/EIPs/pull/2341[EIP-2341]*
+
+The forward compatible EVM require a one-time backward incompatible
+change. As a result, it has to be bundled with account versioning. We
+deploy version `0` as the legacy version, and freeze it, and version
+`1` as the forward-compatible version, and adopt the above
+changes. From this point on, new feature upgrades, such as new opcodes
+and gas cost recalibration, can be adopted directly on the
+forward-compatible version, without defining any new versions.
+
+Only requiring two versions will help a lot in terms of reducing
+engineering complexity.
+
+==== Legacy Repricing and Encouraging Usage of Forward Compatible Version
+
+This is further discussed in a <<legacy-repricing.adoc#,standalone
+article>>.
+
+One issue often popped up for discussions related to
+forward-compatible EVM is how we deal with the legacy version. After
+all, a factory contract can be pre-deployed when forward-compatible
+EVM is in place, thus allow indefinite usage of legacy version.
+
+The answer to this issue lies in the fact that we still *support* the
+legacy version. Deploying new contracts as legacy version or
+continuing to use legacy version contracts should always be valid
+operations. We just encourage usage of the forward compatible EVM.
+
+As long as there are no known EVM vulnerabilities, using legacy
+versions is always fine. If there are vulnerabilities, we need
+emergency hard fork to patch it in legacy versions and backward
+compatibility has to be broken anyway. On the other hand, we can do
+changes such as systematically decrease opcode gas cost, so that older
+account versions are slightly more expensive to use, and contracts are
+better off migrating to the forward-compatible EVM version when it is
+possible, so as to encourage use of new versions.
+
+To give a practical example, consider we decide to apply EIP-1884
+(which is known to break backwared compatibiliy on Ethereum network,
+and addresses a potential exploit in trie access). In the current
+EIP-1884 specs, we increase certain opcode's gas cost, but note that
+this is functionally equivalent to decrease other opcode's gas
+cost. We apply EIP-1884 as follows:
+
+* In legacy EVM (version `0`), we do nothing.
+* In forward-compatible EVM (version `1`), we apply EIP-1884 by
+  decreasing other opcode's gas cost.
+
+After this is done, we make sure to inform miners to configure their
+client to set the block gas limit according to the forward-compatible
+EVM gas cost config. Note that this is something that has to be done
+when we re-calibrate gas cost anyway, no matter whether account
+versioning is in place. When hard fork happens:
+
+* In forward-compatible EVM, any exploit is fixed, because as noted
+  earlier, while we do not change gas cost of `SLOAD`, etc, we
+  decreased gas cost of all other opcodes, which is functionality
+  equivalent to increasing gas cost of `SLOAD`, etc.
+* In legacy EVM, the situation is that `SLOAD` gas cost equal to the
+  forward-compatible EVM, while other opcode gas cost is more
+  expensive compared with the forward-compatible EVM. The gas config
+  becomes in all cases more expensive compared with forward-compatible
+  EVM. As a result, the exploit also cannot happen.
+  
+This method certainly involves a slight increase in implementation
+complexity. But once things move forward to the forward-compatible
+EVM, we can expect less and less of this when we do gas cost
+changes and things can move more smoothly.

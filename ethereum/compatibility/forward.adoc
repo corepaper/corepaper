@@ -1,0 +1,107 @@
+= Forward-compatible EVM
+Wei Tang <@sorpaas>
+:license: Apache-2.0
+
+[meta="description"]
+Design of a forward-compatible EVM that will not break contracts
+when applying feature upgrades.
+
+Forward-compatible EVM proposals are based on the observations that
+currently most hard fork changes we want to adopt mainly results in
+backward compatibilty issues in two categories:
+
+* **Opcode Addition**: Appending a new opcode to the insturction list
+  can break past contract's assumption of unused/invalid opcodes.
+* **Gas Repricing**: Nearly all Ethereum contracts on-chain currently
+  make at least some assumptions about gas costs. Gas repricing can
+  break those assumptions.
+
+## Disable Deployment of Unused Opcodes
+
+NOTE: This section describes a specification, with identifier
+https://specs.corepaper.org/40-unused[40-UNUSED].
+(https://specs.corepaper.org/40-unused/discuss[Discuss])
+
+If unused opcodes can break backward compatibility, we only need to
+disallow deployment of unused opcodes to ensure forward
+compatibility. As a result, the proposal introduce a new validation
+process upon any contract deployment.
+
+=== Specification
+
+Upon contract deployment, either through CREATE and CREATE2 opcode, or
+via contract creation transaction, run an extra validation step:
+
+* Iterate over the code bytes one by one.
+  * If the code byte is a `PUSH(n)` opcode, skip next n bytes.
+  * If the code byte is a valid opcode or designated invalid
+  instruction (`0xfe`), continue. 
+  * Otherwise, throw out-of-gas.
+  
+=== Interactions
+
+For any new additional opcode deployed, they should be added to the
+valid opcode list, and subject to the check described in the
+specification. Even if the new opcode is a multi-byte or
+special-instruction opcode (for example `BEGINDATA`), this
+specification ensures that it is forward-compatible with them. In
+other words, new opcodes can modify the validation step as described
+in specification, while have guarantees that no past instance of the
+opcode has been deployed.
+
+== Remove Gas Observables and Better Error Handling
+
+NOTE: This section describes a specification, with identifier
+https://specs.corepaper.org/39-ungas[39-UNGAS].
+(https://specs.corepaper.org/39-ungas/discuss[Discuss])
+
+Core developers have long expressed their concerns that contracts
+should not make any assumptions about gas cost. As a result, the EVM
+itself should not make available any observables related to gas
+cost. In particular, `GAS` opcode, and the gas parameters in
+call/create opcodes. This specification also provides a better error
+handling model, which significantly simplifies the threat model of
+smart contract developers, discussed as part of [Error
+Handling](../error/execution.md).
+
+=== Specification
+
+Apply the following changes to EVM. Firstly, disable `GAS`
+opcode. Treat it the same as an unused opcode.
+
+Secondly, change the current EVM error types into the following:
+
+* **Recoverable Error**: An explicit `REVERT` opcode. This error will
+  be reported back to parent execution frame. It refunds remaining
+  gases, but revert all changes in current execution frame.
+* **Unrecoverable Error**: Fatal error. Consume all gases, revert all
+  changes in current transaction, and exit.
+
+When an "out-of-gas" error happens in current execution frame, treat
+it as *unrecoverable error*.  The behavior of `REVERT` opcode remains
+unchanged, and it remains a *recoverable error*.
+
+Thirdly, in `CALL`, `CALLCODE`, `DELEGATECALL` and `STATICCALL`, the
+gas parameter is removed (opcode will pop one less item from
+stack). Instead, the opcode will operate as if that parameter is set
+to the current available gas $\mu_g$.
+
+=== Interactions
+
+When deployed together with account versioning, the fatal error
+behavior should be preserved. If current execution frame has this
+specification applied, then "out-of-gas" should always result in full
+revert of current transaction, regardless of whether parent execution
+frame is of legacy version or not. If child execution frame is of
+legacy version, its out of gas error should remain the old behavior
+and be passed to parent execution frame.
+
+When deployed together with
+https://specs.corepaper.org/40-unused/[40-UNUSED], `GAS` should be
+subject to the unused opcode check prior to contract deployment.
+
+=== Notes
+
+* The current available gas $\mu_g$ passed to `CALL`, `CALLCODE`,
+  `DELEGATECALL` and `STATICCALL` act as if it is *input* of the *gas*
+  parameter. That is, the "all but 1/64" rule still applies.
