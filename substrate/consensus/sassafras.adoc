@@ -1,0 +1,33 @@
+= Sassafras
+Wei Tang <@sorpaas>
+:license: Apache-2.0
+
+[meta="description"]
+This article contains some notes about the Sassafras consensus engine.
+
+Sassafras is also known as "BADASS BABE" or "SASSY". Developed by Jeff
+Burdges, Alistair Stewart, Sergey Vasilyev and others, it aims at
+fixing some short-comings of BABE and thus making the Polkadot network
+more secure.
+
+== Sassafras via Schnorrkel
+
+This is a simplified version of Sassafras, directly using
+Schnorrkel. This is mostly used as an intermediate process towards
+Sassafras via Ring VRF, and thus does not have the same strong
+security properties as Sassafras. The overall process works as follows:
+
+1. At epoch stem:[N], each validator generates schnorrkel VRFs `(VRFOutput,
+   VRFProof)`, select those `H_1(VRFOutput)` passing the threshold, and
+   send them to `H_2(VRFOutput)`.
+2. At epoch stem:[N+1], each validator publishes the VRFs they received,
+   directly as transactions on-chain.
+2.1. Runtime does not validate the VRF. Rather, it is validated by
+   consensus engine at the end of the block. Invalid VRFs are
+   simply ignored.
+2.2. The reason for publishing as transactions is for future reward
+   system extension, which will be han dled by runtime, and for reuse
+   of transaction pool.
+3. At the end block of epoch stem:[N+1], consensus sorts the VRF gathered
+   as this epoch, using "outside-in" order.
+4. The block proposers at epoch stem:[N+2] will be VRFs produced above.
