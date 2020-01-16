@@ -84,7 +84,7 @@ unchanged, and it remains a *recoverable error*.
 Thirdly, in `CALL`, `CALLCODE`, `DELEGATECALL` and `STATICCALL`, the
 gas parameter is removed (opcode will pop one less item from
 stack). Instead, the opcode will operate as if that parameter is set
-to the current available gas $\mu_g$.
+to the current available gas stem:[\mu_g].
 
 === Interactions
 
@@ -102,6 +102,6 @@ subject to the unused opcode check prior to contract deployment.
 
 === Notes
 
-* The current available gas $\mu_g$ passed to `CALL`, `CALLCODE`,
+* The current available gas stem:[\mu_g] passed to `CALL`, `CALLCODE`,
   `DELEGATECALL` and `STATICCALL` act as if it is *input* of the *gas*
   parameter. That is, the "all but 1/64" rule still applies.
