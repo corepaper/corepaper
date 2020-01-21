@@ -38,12 +38,9 @@ algorithm changes.
 
 ==== For Hardware Inclusion
 
-*Proposals:
- link:https://ecips.ethereumclassic.org/ECIPs/ecip-1043[ECIP-1043]*
-
-This proposal limits the DAG size. Originally, DAG size growth is to
-provide ASIC resistance. However, it's currently growing over the
-range where many commonly used GPUs will not be able to mine.
+Proposals of this kind limit the DAG size. Originally, DAG size growth
+is to provide ASIC resistance. However, it's currently growing over
+the range where many commonly used GPUs will not be able to mine.
 
 === ProgPoW
 
@@ -55,19 +52,14 @@ being ASIC resistant.
 
 === Keccak256
 
-*Proposals:
- link:https://ecips.ethereumclassic.org/ECIPs/ecip-1049[ECIP-1049]*
-
 Another group of people think ASIC resistance is impossible, and maybe
-even harmful to accomplish. The proposal, ECIP-1049, switches to an
+even harmful to accomplish. Some proposals attempt to switch to an
 ASIC friendly algorithm Keccak256.
 
 == Difficulty Bomb
 
 *Proposals: link:https://eips.ethereum.org/EIPS/eip-649[EIP-649],
-link:https://eips.ethereum.org/EIPS/eip-1234[EIP-1234],
-link:https://ecips.ethereumclassic.org/ECIPs/ecip-1010[ECIP-1010],
-link:https://ecips.ethereumclassic.org/ECIPs/ecip-1041[ECIP-1041]*
+link:https://eips.ethereum.org/EIPS/eip-1234[EIP-1234]*
 
 Difficulty bomb is a mechanic added as
 link:https://blog.ethereum.org/2015/08/04/ethereum-protocol-update-1/[the

@@ -79,9 +79,7 @@ link:https://specs.that.world/28-carbonvote/[28-CARBONVOTE].
 
 === Miner Voting Process
 
-*Proposals: link:https://specs.that.world/27-minervote/[27-MINERVOTE],
-link:https://ecips.ethereumclassic.org/ECIPs/ecip-1022[ECIP-1022],
-link:https://ecips.ethereumclassic.org/ECIPs/ecip-1076[ECIP-1076]*
+*Proposals: link:https://specs.that.world/27-minervote/[27-MINERVOTE]*
 
 Miner vote allows miners to use their mining power to signal their
 preferences. One hash, one vote.
@@ -93,14 +91,12 @@ miner vote process happens.
 Informal miner vote just requires miners to configure their software
 so that the extra data is written in a particular pattern, for
 example, with a prefix or postfix, and then manually count them. This
-happened in Ethereum with the ProgPoW signaling. In Ethereum Classic,
-a proposal ECIP-1076 is also created to allow miners to signal on
-mining algorithm changes, mostly SHA-3.
+happened in Ethereum with the ProgPoW signaling.
 
 Formal miner vote takes the voting process more seriously, and
 optionally bind it to an actual upgrade process. Once enough miners
 signal support, an upgrade will happen automatically. Those are
-processes such as 27-MINERVOTE and ECIP-1022.
+processes such as 27-MINERVOTE.
 
 === Generalized Voting Process
 

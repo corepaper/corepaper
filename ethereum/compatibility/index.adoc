@@ -84,8 +84,7 @@ process can be bypassed completely, thus creating security issues.
 ### RLP Fields
 
 *Proposals: https://specs.that.world/43-ver/[43-VER],
-https://eips.ethereum.org/EIPS/eip-1702[EIP-1702],
-https://ecips.ethereumclassic.org/ECIPs/ecip-1040[ECIP-1040]*
+https://eips.ethereum.org/EIPS/eip-1702[EIP-1702]*
 
 The most accepted variation of account versioning is probably through
 RLP field. In Ethereum, account state are stored using a mapping from
@@ -166,7 +165,6 @@ to be data.
 === Deployment
 
 *Proposals:
-https://ecips.ethereumclassic.org/ECIPs/ecip-1065[ECIP-1065],
 https://github.com/ethereum/EIPs/pull/2341[EIP-2341]*
 
 The forward compatible EVM require a one-time backward incompatible

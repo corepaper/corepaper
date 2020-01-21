@@ -18,9 +18,6 @@ proposed solutions.
 
 == Reduce Block Gas Limit
 
-*Proposals:
-https://ecips.ethereumclassic.org/ECIPs/ecip-1047[ECIP-1047]*
-
 The major issue of contracts like GasToken is that it causes fast
 state size growth. One of the simplest method to limit state size
 growth is to simply reduce the block gas limit. With less state access
