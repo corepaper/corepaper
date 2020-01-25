@@ -49,7 +49,7 @@ other words, new opcodes can modify the validation step as described
 in specification, while have guarantees that no past instance of the
 opcode has been deployed.
 
-== Remove Gas Observables and Better Error Handling
+== Remove Gas Observables and Better Error Handling [[remove-gas-observables-and-better-error-handling]]
 
 NOTE: This section describes a specification, with identifier
 https://specs.corepaper.org/39-ungas[39-UNGAS].
