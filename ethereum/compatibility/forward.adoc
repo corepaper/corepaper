@@ -61,8 +61,8 @@ itself should not make available any observables related to gas
 cost. In particular, `GAS` opcode, and the gas parameters in
 call/create opcodes. This specification also provides a better error
 handling model, which significantly simplifies the threat model of
-smart contract developers, discussed as part of [Error
-Handling](../error/execution.md).
+smart contract developers, discussed as part of
+<<../error/execution.adoc#,Error Handling>>.
 
 === Specification
 
