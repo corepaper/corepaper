@@ -3,3 +3,7 @@ Wei Tang <@sorpaas>
 
 This repository has the source code of Core Paper documents. It is
 best viewed at link:https://corepaper.org[the Website].
+
+////
+vim: syntax=asciidoc
+////
