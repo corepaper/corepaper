@@ -14,3 +14,9 @@ Core Paper consists of several sub-projects:
   including link:https://kulupu.network[Kulupu].
 * *Core Paper of Solri*: link:https://solri.org[Solri] family
    blockchains.
+
+== Contributing
+
+Please send pull requests to the
+link:https://github.com/corepaper/corepaper[Github repository]. You
+can also directly mail patches to link:mailto:hi@that.world[Wei Tang].
