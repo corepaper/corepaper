@@ -6,3 +6,20 @@ Wei Tang <@sorpaas>
 Core Paper of Ethereum aims at providing an overview of Ethereum
 Virtual Machine, and available enhancements that can be applied on
 Ethereum and Ethereum Classic blockchains.
+
+== Proposals
+
+Currently, we cherry-pick some pressing issues on Ethereum, and
+attempt to provide an overview of all available proposals falling
+under those categories.
+
+- **link:./compatibility/index.adoc[Backward Compatibility]**:
+  Backward compatibility enhancements such as account versioning,
+  versionless EVM, and `BEGINDATA` opcode.
+- **link:./error/index.adoc[Error Handling]**: Unrecoverable and
+  recoverable error handlings.
+- **link:./upgrade.adoc[Feature Upgrade]**: Hard fork, soft fork, and
+  processes for gathering opinions on whether a hard fork or soft fork
+  should proceed.
+- **link:./mining.adoc[Mining Algorithms]**: Switching mining
+  algorithms and related issues.
