@@ -16,11 +16,10 @@ backward compatibilty issues in two categories:
   make at least some assumptions about gas costs. Gas repricing can
   break those assumptions.
 
-## Disable Deployment of Unused Opcodes
-
-NOTE: This section describes a specification, with identifier
-https://specs.corepaper.org/40-unused[40-UNUSED].
-(https://specs.corepaper.org/40-unused/discuss[Discuss])
+== Disable Deployment of Unused Opcodes
+[spec]
+id: 40-UNUSED
+discuss: https://github.com/corepaper/corepaper/issues/1
 
 If unused opcodes can break backward compatibility, we only need to
 disallow deployment of unused opcodes to ensure forward
@@ -49,11 +48,10 @@ other words, new opcodes can modify the validation step as described
 in specification, while have guarantees that no past instance of the
 opcode has been deployed.
 
-== Remove Gas Observables and Better Error Handling [[remove-gas-observables-and-better-error-handling]]
-
-NOTE: This section describes a specification, with identifier
-https://specs.corepaper.org/39-ungas[39-UNGAS].
-(https://specs.corepaper.org/39-ungas/discuss[Discuss])
+== Remove Gas Observables and Better Error Handling
+[spec]
+id: 39-UNGAS
+discuss: https://github.com/corepaper/corepaper/issues/1
 
 Core developers have long expressed their concerns that contracts
 should not make any assumptions about gas cost. As a result, the EVM

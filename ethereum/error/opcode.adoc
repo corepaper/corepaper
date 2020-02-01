@@ -21,10 +21,9 @@ silently warps when overflowing. This has turned out to be a security
 issue, with known exploit happened in the past.
 
 == Consistent Copy-to-memory Behavior
-
-NOTE: This section describes a specification, with identifier
-https://specs.corepaper.org/47-cpym[47-CPYM].
-(https://specs.corepaper.org/47-cpym/discuss[Discuss])
+[spec]
+id: 47-CPYM
+discuss: https://github.com/corepaper/corepaper/issues/2
 
 Some opcodes requires copying data into EVM memory. Overtime,
 inconsistent behavior appears. Some opcodes will panic if the offset
@@ -59,10 +58,9 @@ buffer to memory. It has a specific behavior that the length copied is
 `min(stack(out_len), buffer_len)`.
 
 == Explicit Memory Growth
-
-NOTE: This section describes a specification, with identifier
-https://specs.corepaper.org/48-growm[48-GROWM].
-(https://specs.corepaper.org/48-growm/discuss[Discuss])
+[spec]
+id: 48-GROWM
+discuss: https://github.com/corepaper/corepaper/issues/2
 
 Current EVM silently grows memory, whenever a higher region is
 accessed. While this design does not have apparent downside, it

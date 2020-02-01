@@ -118,10 +118,9 @@ In this section, we provide several specifications to address
 currently known review issues.
 
 ==== Standalone Self Balance
-
-NOTE: This section describes a specification, with identifier
-https://specs.corepaper.org/50-selfbalance[50-SELFBALANCE].
-(https://specs.corepaper.org/50-selfbalance/discuss[Discuss])
+[spec]
+id: 50-SELFBALANCE
+discuss: https://github.com/corepaper/corepaper/issues/3
 
 This section provides a standalone specification for the `SELFBALANCE`
 opcode.
@@ -136,10 +135,9 @@ A new opcode, `SELFBALANCE` is introduced at `0x47`.
 * `SELFBALANCE` is priced as GasFastStep, at 5 gas.
 
 ==== Aztlan Fix
-
-NOTE: This section describes a specification, with identifier
-https://specs.corepaper.org/49-aztlanfix[49-AZTLANFIX].
-(https://specs.corepaper.org/49-aztlanfix/discuss[Discuss])
+[spec]
+id: 49-AZTLANFIX
+discuss: https://github.com/corepaper/corepaper/issues/3
 
 This provides a specification as a "fix" to the current Aztlan hard
 fork. That is, it can be applied after Aztlan to fix the current
@@ -153,10 +151,9 @@ After `HARD_FORK_BLOCK`, apply the following changes:
 * Enable https://specs.corepaper.org/50-selfbalance[50-SELFBALANCE].
 
 ==== Aztlan Redo
-
-NOTE: This section describes a specification, with identifier
-https://specs.corepaper.org/51-aztlanredo[51-AZTLANREDO].
-(https://specs.corepaper.org/51-aztlanredo/discuss[Discuss])
+[spec]
+id: 51-AZTLANREDO
+discuss: https://github.com/corepaper/corepaper/issues/3
 
 This provides a specification that "redo" Aztlan hard fork. This
 assumes that Aztlan will not go through, and a new specification will

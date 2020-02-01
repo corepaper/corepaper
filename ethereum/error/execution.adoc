@@ -52,10 +52,9 @@ specification of this is described as part of
 <<../compatibility/forward.adoc#,Forward-compatible EVM>>.
 
 == Explicit Checkpointing
-
-NOTE: This section describes a specification, with identifier
-https://specs.corepaper.org/46-checkpoint[46-CHECKPOINT].
-(https://specs.corepaper.org/46-checkpoint/discuss[Discuss])
+[spec]
+id: 46-CHECKPOINT
+discuss: https://github.com/corepaper/corepaper/issues/2
 
 One of the overhead for running EVM is that checkpointing is always
 required for all execution frame invocations. This is the case because

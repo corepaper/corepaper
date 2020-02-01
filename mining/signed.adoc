@@ -77,9 +77,9 @@ miner. Transmitting large amount of signatures through the network is
 impractical and inefficient.
 
 == Ethereum
-
-NOTE: This section describes a specification, with identifier
-*52-ESIGNED*.
+[spec]
+id: 52-ESIGNED
+discuss: https://github.com/corepaper/corepaper/issues/4
 
 === Specification
 
@@ -102,9 +102,9 @@ following:
   and `nonce`.
 
 == Kulupu
-
-NOTE: This section describes a specification, with identifier
-*53-KSIGNED*.
+[spec]
+id: 53-KSIGNED
+discuss: https://github.com/corepaper/corepaper/issues/4
 
 === Specification
 
