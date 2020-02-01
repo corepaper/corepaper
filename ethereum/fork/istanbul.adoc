@@ -137,6 +137,7 @@ A new opcode, `SELFBALANCE` is introduced at `0x47`.
 ==== Aztlan Fix
 [spec]
 id: 49-AZTLANFIX
+description: Aztlan Fix Hard Fork
 discuss: https://github.com/corepaper/corepaper/issues/3
 
 This provides a specification as a "fix" to the current Aztlan hard
@@ -153,6 +154,7 @@ After `HARD_FORK_BLOCK`, apply the following changes:
 ==== Aztlan Redo
 [spec]
 id: 51-AZTLANREDO
+description: Aztlan Redo Hard Fork
 discuss: https://github.com/corepaper/corepaper/issues/3
 
 This provides a specification that "redo" Aztlan hard fork. This

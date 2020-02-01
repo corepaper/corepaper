@@ -79,6 +79,7 @@ impractical and inefficient.
 == Ethereum
 [spec]
 id: 52-ESIGNED
+description: Signed Mining for Ethereum
 discuss: https://github.com/corepaper/corepaper/issues/4
 
 === Specification
@@ -104,6 +105,7 @@ following:
 == Kulupu
 [spec]
 id: 53-KSIGNED
+description: Signed Mining for Kulupu
 discuss: https://github.com/corepaper/corepaper/issues/4
 
 === Specification
