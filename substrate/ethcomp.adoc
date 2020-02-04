@@ -1,4 +1,4 @@
-= Ethereum Compatibility Layer for Substrate
+= Ethereum Compatibility Layer
 Wei Tang <@sorpaas>
 :license: CC-BY-SA-4.0
 
