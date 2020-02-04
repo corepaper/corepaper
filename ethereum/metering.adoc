@@ -3,7 +3,7 @@ Wei Tang <@sorpaas>
 :license: CC-BY-SA-4.0
 :license-code: Apache-2.0
 
-[description]
+[meta=description]
 Gas metering in Ethereum is used to calculate the cost of a particular
 contract execution. This article discusses improvements we can do to
 make metering better.
