@@ -27,9 +27,7 @@ we only want to let miners control the gas cost of `SLOAD` and
 `BALANCE` opcode. The gas table is defined as follows:
 
 [source]
----
 [ SLOAD_GAS, BALANCE_GAS ]
----
 
 Change EVM so that when calling `SLAOD` and `BALANCE`, use the gas
 cost of values defined in the new gas table.
