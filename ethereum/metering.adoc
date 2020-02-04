@@ -1,0 +1,69 @@
+= Metering
+Wei Tang <@sorpaas>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[description]
+Gas metering in Ethereum is used to calculate the cost of a particular
+contract execution. This article discusses improvements we can do to
+make metering better.
+
+== Miner-controlled Metering
+[spec]
+id: 54-MMETER
+discuss: https://github.com/corepaper/corepaper/issues/5
+
+This section discusses miner-controlled metering, a method to combat
+opcode gas mis-price, by allowing it to be controlled by miners. For
+background, refer to link:https://arxiv.org/abs/1909.07220[this paper]
+and the discussions in <<fork/istanbul.adoc#,Istanbul hard fork>>.
+
+=== Specification
+
+Define the gas table, stored in each client in RLP encoded format. We
+do not present a complete gas table here, but provide an example. The
+format of gas table can be changed in each hard fork. Below, consider
+we only want to let miners control the gas cost of `SLOAD` and
+`BALANCE` opcode. The gas table is defined as follows:
+
+[source]
+---
+[ SLOAD_GAS, BALANCE_GAS ]
+---
+
+Change EVM so that when calling `SLAOD` and `BALANCE`, use the gas
+cost of values defined in the new gas table.
+
+Add an additional header RLP field `cost`. The new field can have one
+of the following values:
+
+* *Empty RLP*: This indicates that the miner proposes no gas cost
+   change in current block.
+* `[ ff ff, < raw RLP encoding of the new gas table > ]`: This
+  indicates that a hard fork happened, and the gas cost table is
+  changed to a new one, encoded as the second item.
+* `[ < other 2-byte value >, < keccak256 hash of RLP encoding of the
+  new gas table > ]`: This indicates that miners propose to change the
+  current gas table, with instructions provided in the first RLP item,
+  and new gas table hash provided in the second RLP item.
+
+Given the above example gas table of `SLOAD` and `BALANCE`, we can
+define the following instruction table:
+
+[cols=2*,options="header"]
+|===
+|Instruction
+|Description
+
+|`01 31`
+|Increase `BALANCE` gas cost by 1%, or `1`, whichever is bigger.
+
+|`02 31`
+|Decrease `BALANCE` gas cost by 1%, or `1`, whichever is bigger.
+
+|`01 54`
+|Increase `SLOAD` gas cost by 1%, or `1`, whichever is bigger.
+
+|`02 54`
+|Decrease `SLOAD` gas cost by 1%, or `1`, whichever is bigger.
+|===
