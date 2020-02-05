@@ -43,37 +43,15 @@ without private keys_, but is simpler.
 The module would handle the essence of EVM invocations, and is
 implemented as `pallet-evm`.
 
-==== External State
+==== State Import
 
 NOTE: This section describes something that has not yet been
 implemented.
 
-The pallet should be able to delegate state fetching (both accounts
-and storage) via an external trait.
+The pallet should be able to directly import state, both in genesis
+config, and through `sudo` transactions.
 
-[source,rust]
-----
-trait ExternalBackend {
-  type Error;
-
-  fn account(
-    &self,
-    address: H160
-  ) -> Result<(evm::backend::Basic, Vec<u8>), Self::Error>;
-  fn storage(&self, address: H160, index: H256) -> Result<H256, Self::Error>;
-}
-----
-
-When state is accessed, we first check whether internal state exists,
-if so, use it. If not, fetch the value via the external trait. State
-are always committed internally.
-
-Note the difference compared with internal state that the access can
-fail. If the access failed, discard all current EVM changes, consume
-all gases, and exit. This is the same as an "unsupported" error in
-`rust-evm`.
-
-=== Block Processing Emulatiom Pallet
+=== Ethereum Pallet
 
 NOTE: This section describes something that has not yet been
 implemented.
@@ -81,24 +59,19 @@ implemented.
 A separate pallet module `pallet-ethereum` is required to emulate the
 full block processing part. This pallet has two main functionalities:
 
-* Store the pin of state import, if any.
-* Store mapping of secp256k1 keys to sr25519 keys.
+* Store invoked transactions and their receipts.
 * Delegate call the EVM pallet, so that separate transaction and
   receipt information can be generated.
 
 The module will have at least the following extrinsics:
 
-* `proveState`: it takes an object returned by `eth_getProof`, and
-  commit the returned state.
 * `transact`: take a full Ethereum transaction, decode the RLP object,
   and delegate the call to EVM pallet. It then gathers the logs and
   receipts, and store them. There can be a whitelist of secp256k1 keys
   to sr25519 keys, or it can be configured to skip secp256k1 signature
   verification at all.
 
-== RPC
-
-=== Internal RPC Module
+== RPC Module
 
 NOTE: This section describes something that has not yet been
 implemented.
@@ -113,21 +86,6 @@ as follows:
   and other PoW-specific values are either none, default, or can be
   configured to be a constant.
 
-=== RPC Bridge
-
-NOTE: This section describes something that has not yet been
-implemented.
-
-The bridge talks with both the internal RPC module, and an Ethereum
-node. It is the endpoint that exposes Ethereum-compatible RPC
-methods. The Ethereum node is either required to be archive, or
-static. Either way, it should always have the state root pinned at
-Substrate's genesis block available.
-
-The bridge's job is to intercept any transactions sent from dapp, and
-accomodate it with an extra `proveState` extrinsic call that actually
-commits state.
-
 The bridge also directly talks with `rust-evm` for anything that does
 not need to write on-chain. For example, `eth_estimateGas`.
 
@@ -136,9 +94,10 @@ not need to write on-chain. For example, `eth_estimateGas`.
 To port a dapp initially designed for Ethereum mainnet, the following
 steps are needed:
 
-* Pick a block on Ethereum mainnet, where the dapp is "frozen". Write
-  down the block's state root.
-* Commit the state root in Substrate's genesis file to
-  `pallet-ethereum`.
-* Start the internal RPC module and the RPC bridge.
+* Pick a block on Ethereum mainnet, where the dapp is "frozen".
+* Use a tool that exports the select account states into an object
+  file.
+* Import the state into Substrate, either in genesis or through sudo
+  transactions.
+* Start the internal RPC module.
 * Now the dapp can be used as normal.
