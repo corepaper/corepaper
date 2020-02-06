@@ -1,0 +1,81 @@
+= Voluntary Council
+Wei Tang <@sorpaas>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[meta=description]
+This article provides a description of "voluntary council", as a form
+of governance model for decentralized blockchains. It ensures both that
+users have choices whether to follow a hard fork or not, and that the
+whole method is fully automated, without worries about non-scalable
+human process.
+
+Voluntary council is the planned governance model for
+link:https://solri.org[Solri] and
+link:https://kulupu.network[Kulupu]. This governance model also works
+best in a Substrate-based blockchain. Also note that the focus of this
+article is to provide a general framework for implementing voluntary
+council, rather than specific descriptions of particular council
+modules.
+
+== Sudo Inherents
+
+Those are _extrinsics_ that can be included in a block. They are
+always rejected by default. The client can configure whitelists to
+allow specific _sudo inherents_ to be included.
+
+An example of the sudo inherent is Kulupu's
+link:https://github.com/kulupu/kulupu/tree/master/anyupgrade[anyupgrade]
+module. The module configures extrinsic `any` and `any_as` as
+inherents, and then by default rejects them. A specific
+`ProvideInherentData` is then used to customize and whitelist
+particular upgrades that the user wants to config as valid.
+
+Instead of simple whitelisting, a more sophisticated sudo inherent
+implementation would be tight with a particular council, which we will
+explain in the next section. This method avoids the need for users to
+manually select feature upgrades every time, while in the mean time,
+still makes end users the ultimate decider.
+
+By using WebAssembly/RISC-V as the runtime, end users can take their
+own pace to upgrade clients as frequently or seldomly as they see fit,
+while still be able to sync with the network at any time.
+
+=== Weighted Rejection
+
+When rejecting a block due to sudo inherent, the client can choose to
+not fully reject the block, but accept the block, and set its weight
+to maximum negative value. This allows all branches of feature
+upgrades to technically stay in the same blockchain. If the end user
+changes mind and later decide to follow a different feature upgrade
+branch, the client can simply do a reorg, as long as the state of the
+range of the reorg still exists.
+
+== Council Modules
+
+Councils are arrangers of feature upgrades. They are normal contracts,
+for example, resides in `pallet-contracts` or `pallet-evm`. Councils
+can be simply human process (such as multi-sig contracts), voting
+process (such as coin voting or miner voting), or any other
+programmable process. The council must emit the following interface:
+
+[source,rust]
+trait Council {
+  fn upgrades() -> Option<(NumberFor<Block>, Vec<Extrinsic>)>;
+}
+
+`Council::upgrades` method should not emit any state changes. It
+returns the sudo inherents that it expects to exist in a proceeding
+block, as specified by the number.
+
+Upon end user starts a new client, it will prompt to select a
+council. The client will then track that particular council contract
+for feature upgrades, and reject blocks that has unknown sudo
+inherents, or does not have expected sudo inherents.
+
+=== Switching Council
+
+Each council switching operation will require the client to
+recalculate weights of all stored blocks, so it's not a cheap
+operation. Client should also allow end user to select multiple
+councils to follow for separated block ranges.
