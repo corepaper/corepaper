@@ -59,10 +59,11 @@ fee payment happens to the signer of the transaction.
 === Call Group Dependency
 
 Within a call group, calls can depend on other calls. Special EVM
-opcodes or Substrate WebAssembly extern is exposed to get the majority
-of call information. Note that to avoid the bad consequence of the
-infamous link:https://www.hyrumslaw.com[Hyrum's Law], we do not expose
-gas limit information within a smart contract execution environment.
+opcodes or Substrate WebAssembly externs are exposed to get the
+majority of call information. Note that to avoid the bad consequence
+of the infamous link:https://www.hyrumslaw.com[Hyrum's Law], we do not
+expose gas limit information within a smart contract execution
+environment.
 
 A call can retrieve other calls origin, destination, value and data
 information. If the condition does not hold, the call is expected to
