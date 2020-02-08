@@ -1,0 +1,141 @@
+= Call Group
+Wei Tang <@sorpaas>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[meta=description]
+Call group is a proposed semantic for smart contract
+transactions, by grouping several calls together, and allows
+independent calls to interact with each other.
+
+All things call group can do can be done by plain transactions, but
+call group makes smart contracts more natural and aligned with how
+real-world contract works.
+
+== Design
+
+In both Ethereum and Substrate, smart contracts are invoked via
+transactions. A *call* structure describes a full invocation of a
+particular smart contract. For example, in Substrate, the call
+structure is as follows:
+
+[source,rust]
+fn call(
+  origin,
+  dest: <T::Lookup as StaticLookup>::Source,
+  #[compact] value: BalanceOf<T>,
+  #[compact] gas_limit: Gas,
+  data: Vec<u8>
+);
+
+In Ethereum, the current call sturcture is similar:
+
+[source,rust]
+fn call(
+  origin,
+  dest: H160,
+  value: U256,
+  nonce: U256,
+  gas_price: U256,
+  gas_limit: U256,
+  data: Vec<u8>,
+);
+
+In both cases, only one call is invoked at a time, and it is not
+possible for multiple calls to be dependent on each other, for
+example, to succeed and to fail at the same time. *Call group* extends
+current call structures we have to group multiple calls.
+
+[source,rust]
+fn call(origin, dest, value, data, gas_limit, [nonce]);
+fn transact(origin, calls: Vec<fn call>, [gas_price]);
+
+=== Signature and Fee Payment
+
+A *call* is signed by itself. Calls form call groups, which is in turn
+included in a *transaction*. The transaction is again signed. The gas
+fee payment happens to the signer of the transaction.
+
+=== Call Group Dependency
+
+Within a call group, calls can depend on other calls. Special EVM
+opcodes or Substrate WebAssembly extern is exposed to get the majority
+of call information. Note that to avoid the bad consequence of the
+infamous link:https://www.hyrumslaw.com[Hyrum's Law], we do not expose
+gas limit information within a smart contract execution environment.
+
+A call can retrieve other calls origin, destination, value and data
+information. If the condition does not hold, the call is expected to
+panic or emit out-of-gas error that fully revert all current call
+status.
+
+A call can also declare that it needs a particular call within the
+call group to succeed. After the call group execution, if the required
+call failed, all state changes within the call group is reverted.
+
+== Substrate
+[spec]
+id: 55-SCG
+discuss: https://github.com/corepaper/corepaper/issues/6
+description: Call Group Transaction for Substrate Contracts
+
+NOTE: This is a tentative specification, with possible details not yet
+specified. Join discussions to improve this.
+
+=== Specification
+
+Define the following Substrate contract externs:
+
+* `cg_failall()`: Fail the current call group, consumes all gases
+  within the call group and revert all state changes.
+* `cg_failif(index: u32)`: Fail the current call group if the call, as
+  specified in the index, fails.
+* `cg_len() -> u32`: Get the length of the current call group.
+* `cg_value(index: u32) -> Vec<u8>`: Get the call, encoded in SCALE.
+
+Define a new module call:
+
+[source,rust]
+---
+fn call_group(
+  origin,
+  values: Vec<CallItem>,
+);
+
+struct CallItem {
+  origin: AccountId,
+  dest: AccountId,
+  value: BalanceOf<T>,
+  gas_limit: Gas,
+  data: Vec<u8>
+  signature: Signature,
+}
+---
+
+== Ethereum
+[spec]
+id: 56-ECG
+discuss: https://github.com/corepaper/corepaper/issues/6
+description: Call Group Transaction for Ethereum
+
+NOTE: This is a tentative specification, with possible details not yet
+specified. Join discussions to improve this.
+
+=== Specification
+
+Define the following new opcodes:
+
+* `CG_FAILALL`: Fail the current call group, consumes all gases
+  within the call group and revert all state changes.
+* `CG_FAILIF [index]`: Fail the current call group if the call, as
+  specified in the index, fails.
+* `CG_LEN`: Push the length of the current call group to stack.
+* `CG_VALUE_LEN [index]`: Get length of the call, encoded in RLP
+  format.
+* `CG_VALUE_COPY [index] [mbase] [vbase] [len]`: Copy the call,
+  encoded in RLP format, to memory.
+
+Define a new call group transaction format:
+
+[source,plain]
+[ gasprice, [ [ nonce, gaslimit, to, value, data, v, r, s] ], v, r, s]
