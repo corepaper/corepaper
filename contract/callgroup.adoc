@@ -96,7 +96,7 @@ Define the following Substrate contract externs:
 Define a new module call:
 
 [source,rust]
----
+----
 fn call_group(
   origin,
   values: Vec<CallItem>,
@@ -110,7 +110,7 @@ struct CallItem {
   data: Vec<u8>
   signature: Signature,
 }
----
+----
 
 == Ethereum
 [spec]
