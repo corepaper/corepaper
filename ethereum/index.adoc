@@ -2,7 +2,7 @@
 Wei Tang <@sorpaas>
 :license: Apache-2.0
 
-[meta="description"]
+[meta=description]
 Core Paper of Ethereum aims at providing an overview of Ethereum
 Virtual Machine, and available enhancements that can be applied on
 Ethereum and Ethereum Classic blockchains.
