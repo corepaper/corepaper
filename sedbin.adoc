@@ -116,11 +116,11 @@ block's block time:
 [source,rust]
 ----
 pub fn damp(actual: u128, goal: u128, damp_factor: u128) -> u128 {
-	(actual + (damp_factor - 1) * goal) / damp_factor
+  (actual + (damp_factor - 1) * goal) / damp_factor
 }
 
 pub fn clamp(actual: u128, goal: u128, clamp_factor: u128) -> u128 {
-	max(goal / clamp_factor, min(actual, goal * clamp_factor))
+  max(goal / clamp_factor, min(actual, goal * clamp_factor))
 }
 
 fn difficulty(
