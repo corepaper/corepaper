@@ -2,7 +2,7 @@
 Wei Tang <@sorpaas>
 :license: Apache-2.0
 
-[meta="description"]
+[meta=description]
 Core Paper is a collection of specifications, reviews and descriptions
 of various blockchain projects.
 
@@ -14,6 +14,15 @@ Core Paper consists of several sub-projects:
   including link:https://kulupu.network[Kulupu].
 * *Core Paper of Solri*: link:https://solri.org[Solri] family
    blockchains.
+
+== Community
+
+* *Matrix*:
+   link:https://riot.im/app/#/room/#corepaper:matrix.org[General],
+   link:https://riot.im/app/#/room/#kulupu:matrix.org[Kulupu],
+   link:https://riot.im/app/#/room/#solri:matrix.org[Solri],
+   link:https://riot.im/app/#/room/#ecips:matrix.org[Ethereum Classic]
+* *Discord*: link:https://discordapp.com/invite/b6vZDZs[Invite Link]
 
 == Contributing
 

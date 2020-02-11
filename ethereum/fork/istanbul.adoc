@@ -1,4 +1,4 @@
-= Istanbul and Aztlan Hard Fork
+= Istanbul Hard Fork
 Wei Tang <@sorpaas>
 :license: Apache-2.0
 
