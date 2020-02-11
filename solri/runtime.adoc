@@ -68,6 +68,7 @@ the block and be able to store it in database. The structure should be
 set at `result_ptr`, using C representation:
 
 [source,rust]
+----
 #[repr(C)]
 struct Metadata {
   timestamp: i64,
@@ -82,6 +83,7 @@ struct Metadata {
   code_ptr: i32,
   code_len: i32,
 }
+----
 
 The full block is up to interpretation of the runtime. The runtime
 should return metadata required as defined above. The host can fetch
