@@ -13,8 +13,9 @@ frequently need to change opcode's gas costs. However, if those gas
 costs are depended on by on-chain smart contracts already, changing it
 can break things. This is well-demonstrated by
 link:https://github.com/holiman/eip-1884-security[EIP-1884]. As a
-result, many attempts has been made, including in this article, to
-make gas an unobservable behavior for smart contracts,
+result, many attempts has been made, including in
+link:https://specs.corepaper.org/39-UNGAS[39-UNGAS], to make gas an
+unobservable behavior for smart contracts,
 
 [meta=description]
 In this article, we show that based on current account models
