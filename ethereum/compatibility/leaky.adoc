@@ -61,8 +61,8 @@ _reasonable_ backward and forward compatibility.
 To design reasonable compatibility, we ask this question -- given a
 smart contract, execute it without gasometer at all, does it always
 emit the same result as with gasometer given sufficient gases? If we
-make sure gas is exposed in smart contracts as _information_, not as a
-_mechanism of execution_, then the question can be answered
+make sure gas is exposed in smart contracts as *information*, not as a
+*mechanism of execution*, then the question can be answered
 _yes_. Currently, we do have places where opcodes use gases as
 mechanisms of execution, specifically, in EVM error
 handling. Eliminating them as described in
