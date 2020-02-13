@@ -1,6 +1,7 @@
 = Forward-compatible EVM
 Wei Tang <@sorpaas>
-:license: Apache-2.0
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
 
 [meta="description"]
 Design of a forward-compatible EVM that will not break contracts
@@ -48,26 +49,45 @@ other words, new opcodes can modify the validation step as described
 in specification, while have guarantees that no past instance of the
 opcode has been deployed.
 
-== Remove Gas Observables and Better Error Handling
+== Remove Gas Observables
 [spec]
 id: 39-UNGAS
 discuss: https://github.com/corepaper/corepaper/issues/1
 
+NOTE: See also link:https://specs.corepaper.org/39-UNGAS[39-UNGAS] and
+<<leaky.adoc#,Leaky Abstraction of Gas>>.
+
 Core developers have long expressed their concerns that contracts
 should not make any assumptions about gas cost. As a result, the EVM
 itself should not make available any observables related to gas
-cost. In particular, `GAS` opcode, and the gas parameters in
-call/create opcodes. This specification also provides a better error
-handling model, which significantly simplifies the threat model of
-smart contract developers, discussed as part of
-<<../error/execution.adoc#,Error Handling>>.
+cost. In particular, `GAS` opcode.
 
 === Specification
 
-Apply the following changes to EVM. Firstly, disable `GAS`
-opcode. Treat it the same as an unused opcode.
+Disable `GAS` opcode. Treat it the same as an unused opcode.
 
-Secondly, change the current EVM error types into the following:
+=== Interactions
+
+When deployed together with
+https://specs.corepaper.org/40-unused/[40-UNUSED], `GAS` should be
+subject to the unused opcode check prior to contract deployment.
+
+== Better Error Handling
+[spec]
+id: 57-UNERR
+discuss: https://github.com/corepaper/corepaper/issues/1
+
+NOTE: See <<leaky.adoc#,Leaky Abstraction of Gas>> for rationale of
+this specification.
+
+This removes gas observables in EVM as _mechanisms of execution_. It
+also provides a better error handling model, which significantly
+simplifies the threat model of smart contract developers, discussed as
+part of <<../error/execution.adoc#,Error Handling>>.
+
+=== Specification
+
+Change the current EVM error types into the following:
 
 * **Recoverable Error**: An explicit `REVERT` opcode. This error will
   be reported back to parent execution frame. It refunds remaining
@@ -79,7 +99,7 @@ When an "out-of-gas" error happens in current execution frame, treat
 it as *unrecoverable error*.  The behavior of `REVERT` opcode remains
 unchanged, and it remains a *recoverable error*.
 
-Thirdly, in `CALL`, `CALLCODE`, `DELEGATECALL` and `STATICCALL`, the
+In `CALL`, `CALLCODE`, `DELEGATECALL` and `STATICCALL`, the
 gas parameter is removed (opcode will pop one less item from
 stack). Instead, the opcode will operate as if that parameter is set
 to the current available gas stem:[\mu_g].
@@ -93,10 +113,6 @@ revert of current transaction, regardless of whether parent execution
 frame is of legacy version or not. If child execution frame is of
 legacy version, its out of gas error should remain the old behavior
 and be passed to parent execution frame.
-
-When deployed together with
-https://specs.corepaper.org/40-unused/[40-UNUSED], `GAS` should be
-subject to the unused opcode check prior to contract deployment.
 
 === Notes
 

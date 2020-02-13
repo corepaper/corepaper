@@ -1,0 +1,72 @@
+= Leaky Abstraction of Gas
+Wei Tang <@sorpaas>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+Due to the immutable nature of Ethereum,
+link:https://www.hyrumslaw.com[Hyrum's Law] applies firmly. With a
+sufficient number of users of an API, it does not matter what you
+promise in the contract -- all observable behaviors of your system
+will be depended on by somebody. One such area where Hyrum's Law has
+significant impact is gas metering. Because of gas mis-pricing, we
+frequently need to change opcode's gas costs. However, if those gas
+costs are depended on by on-chain smart contracts already, changing it
+can break things. This is well-demonstrated by
+link:https://github.com/holiman/eip-1884-security[EIP-1884]. As a
+result, many attempts has been made, including in this article, to
+make gas an unobservable behavior for smart contracts,
+
+However in this article, we show that based on current account models
+of Ethereum, gas metering is a _leaky abstraction_. It's impossible to
+completely hide the effects of gas cost, with or without account
+versioning. Even if retracting gas cost is hard, according to Hyrum's
+Law, smart contracts will still choose to depend on it, if they can,
+and thus results in unexpected breakage.
+
+== Gas Cost Deduction from Account Balance
+
+The essence of the leaky abstraction is from the observation that gas
+cost has to interact with transaction fees, and thus interact with
+account balance. Account balance must be an observable variable in
+smart contracts. This is where gas information can leak.
+
+Consider, even if we removed all the observable behavior of gas
+metering within EVM, the contract can still calculate the difference
+of account balances between two calls to know the transaction fee. If
+the gas price is known, the contract can then know the total gas used
+value. This, combined with single-opcode contracts, allows a contract
+to build the complete gas table of the current hard fork, and thus
+emulate the full functionality of gas used.
+
+With account versioning, the gas cost deduction is still doable. This
+is due to the fact that older account versions can still call newer
+account versions. The contract can call a proxy contract, and then use
+the techniques described above to obtain the current gas table.
+
+The issue of gas cost deduction is not fixable even with account
+versioning because contracts have to access states. Because of
+transaction fees, the information of gas cost is inevitably leaked
+to EVM.
+
+== Reasonable Backward and Forward Compatibility
+
+Leaky abstraction of gas results in that _complete_ backward and
+forward compatibility is impossible -- it's always possible to design
+smart contracts that work right now, but won't work in the future when
+some gas costs change. This, however, does not stop one to have
+_reasonable_ backward and forward compatibility.
+
+To design reasonable compatibility, we ask this question -- given a
+smart contract, execute it without gasometer at all, does it always
+emit the same result as with gasometer given sufficient gases? If we
+make sure gas is exposed in smart contracts as _information_, not as a
+_mechanism of execution_, then the question can be answered
+_yes_. Currently, we do have places where opcodes use gases as
+mechanisms of execution, specifically, in EVM error
+handling. Eliminating them as described in
+link:https://specs.corepaper.org/57-UNERR[57-UNERR] will allow us to
+accomplish reasonable compatibility.
+
+On the other hand, `GAS` opcode exposes gas used information solely as
+information, and thus removing it is not necessary to accomplish
+reasonable compatibility.
