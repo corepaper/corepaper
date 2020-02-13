@@ -16,7 +16,8 @@ link:https://github.com/holiman/eip-1884-security[EIP-1884]. As a
 result, many attempts has been made, including in this article, to
 make gas an unobservable behavior for smart contracts,
 
-However in this article, we show that based on current account models
+[meta=description]
+In this article, we show that based on current account models
 of Ethereum, gas metering is a _leaky abstraction_. It's impossible to
 completely hide the effects of gas cost, with or without account
 versioning. Even if retracting gas cost is hard, according to Hyrum's
