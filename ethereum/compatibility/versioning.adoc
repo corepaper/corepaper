@@ -1,0 +1,276 @@
+= Account Versioning
+Wei Tang <@sorpaas>
+:license: CC0-1.0
+
+[meta="description"]
+This defines a method of hard forking while maintaining the exact
+functionality of existing account by allowing multiple versions of the
+virtual machines to execute in the same block. This is also useful to
+define future account state structures when we introduce the on-chain
+WebAssembly virtual machine.
+
+By allowing account versioning, we can execute different virtual
+machine for contracts created at different times. This allows breaking
+features to be implemented while making sure existing contracts work
+as expected.
+
+Note that this specification might not apply to all hard forks. We
+have emergency hard forks in the past due to network attacks. Whether
+they should maintain existing account compatibility should be
+evaluated in individual basis. If the attack can only be executed once
+against some particular contracts, then the scheme defined here might
+still be applicable. Otherwise, having a plain emergency hard fork
+might still be a good idea.
+
+== State-based Account Versioning
+
+=== Specification
+[spec]
+id: 43-VER
+description: Generalized Account Versioning Scheme
+discuss: https://ethereum-magicians.org/t/accounting-versioning/3508
+
+==== Account State
+
+Re-define account state stored in the world state trie to have 5
+items: `nonce`, `balance`, `storageRoot`, `codeHash`, and
+`version`. The newly added field `version` is a 256-bit **scalar**. We
+use the definition of "scalar" from Yellow Paper. Note that this is
+the same type as `nonce` and `balance`, and it is equivalent to a RLP
+variable-sized byte array with no leading zero, of maximum length 32.
+
+When `version` is zero, the account is RLP-encoded with the first 4
+items. When `version` is not zero, the account is RLP-encoded with 5
+items.
+
+Account versions can also optionally define additional account state
+RLP fields, whose meaning are specified through its `version`
+field. In those cases, the parsing strategy is defined in "Additional
+Fields in Account State RLP" section.
+
+==== Contract Execution
+
+When fetching an account code from state, we always fetch the
+associated version field together. We refer to this as the *code's
+version* below. The code of the account is always executed in the
+*code's version*.
+
+In particular, this means that for `DELEGATECALL` and `CALLCODE`, the
+version of the execution call frame is the same as
+delegating/receiving contract's version.
+
+==== Contract Deployment
+
+In Ethereum, a contract has a deployment method, either by a contract
+creation transaction, or by another contract. If we regard this
+deployment method a contract's *parent*, then we find them forming a
+family of contracts, with the *root* being a contract creation
+transaction.
+
+We let a family of contracts to always have the same `version`. That
+is, `CREATE` and `CREATE2` will always deploy contract that has the
+same `version` as the *code's version*.
+
+In other words, `CREATE` and `CREATE2` will execute the init code
+using the current *code's version*, and deploy the contract of the
+current *code's version*. This holds even if the to-be-deployed code
+is empty.
+
+==== Validation
+
+A new phrase, *validation* is added to contract deployment (by
+`CREATE` / `CREATE2` opcodes, or by contract creation
+transaction). When `version` is `0`, the phrase does nothing and
+always succeeds. Future VM versions can define additional validation
+that has to be passed.
+
+If the validation phrase fails, deployment does not proceed and return
+out-of-gas.
+
+==== Contract Creation Transaction
+
+Define `LATEST_VERSION` in a hard fork to be the latest supported VM
+version. A contract creation transaction is always executed in
+`LATEST_VERSION` (which means the *code's version* is
+`LATEST_VERSION`), and deploys contracts of `LATEST_VERSION`. Before a
+contract creation transaction is executed, run *validation* on the
+contract creation code. If it does not pass, return out-of-gas.
+
+==== Precompiled Contract and Externally-owned Address
+
+Precompiled contracts and externally-owned addresses do not have
+`version`. If a message-call transaction or `CALL` / `CALLCODE` /
+`STATICCALL` / `DELEGATECALL` touches a new externally-owned address
+or a non-existing precompiled contract address, it is always created
+with `version` field being `0`.
+
+==== Additional Fields in Account State RLP
+
+In the future we may need to associate more information into an
+account, and we already have some EIP/ECIPs that define new additional
+fields in the account state RLP. In this section, we define the
+parsing strategy when additional fields are added.
+
+* Check the RLP list length, if it is 4, then set account version to
+  `0`, and do not parse any additional fields.
+* If the RLP list length more than 4, set the account version to the
+  scalar at position `4` (counting from `0`).
+  * Check version specification for the number of additional fields
+    defined `N`, if the RLP list length is not equal to `5 + N`,
+    return parse error.
+  * Parse RLP position `5` to `4 + N` as the meaning specified in
+    additional fields.
+
+==== Usage Template
+
+This section defines how other specifications might use this account
+versioning. Note that currently we only define the usage
+template for base layer.
+
+Account versioning is usually applied directly to a hard fork
+meta. Specifications in the hard fork are grouped by the virtual
+machine type, for example, EVM and eWASM. For each of them, we define:
+
+* **Version**: a non-zero scalar less than `2^256` that uniquely
+  identifies this version. Note that it does not need to be
+  sequential.
+* **Parent version**: the base that all new features derived
+  from. With parent version of `0` we define the base to be legacy
+  VM. Note that once a version other than `0` is defined, the legacy
+  VM's feature set must be frozen. When defining an entirely new VM
+  (such as eWASM), parent version does not apply.
+* **Features**: all additional features that are enabled upon this
+  version.
+
+If a meta specification includes specifications that provide
+additional account state RLP fields, we also define:
+
+* **Account fields**: all account fields up to the end of this meta
+  EIP, excluding the basic 5 fields (`nonce`, `balance`,
+  `storageRoot`, `codeHash` and `version`). If EIPs included that are
+  specific to modifying account fields do not modify VM execution
+  logic, it is recommended that we specify an additional version whose
+  execution logic is the same as previous version, but only the
+  account fields are changed.
+
+=== Discussions
+
+==== Performance
+
+Currently nearly all full node implementations uses config parameters
+to decide which virtual machine version to use. Switching virtual
+machine version is simply an operation that changes a pointer using a
+different set of config parameters. As a result, this scheme has
+nearly zero impact to performance.
+
+==== WebAssembly
+
+This scheme can also be helpful when we deploy on-chain WebAssembly
+virtual machine. In that case, WASM contracts and EVM contracts can
+co-exist and the execution boundary and interaction model are clearly
+defined as above.
+
+== Extensions for State-based Account Versioning
+
+=== Contract Creation Transaction Extension
+[spec]
+id: 44-VERTXN
+description: Account Versioning Extension for Contract Creation Transaction
+discuss: https://ethereum-magicians.org/t/accounting-versioning/3508
+
+The base account versioning layer only allows contract of the newest
+version to be deployed via contract creation transaction. This is a
+reasonable assumption for current Ethereum network, because most of
+new features added to EVM are additions, and developers almost never
+want to deploy contracts that are not of the newest version. In this
+section, we provide an extension to allow multiple versions of
+contracts to be deployed via contract creation transaction.
+
+==== Specification
+
+In contract creation transaction, define `version` as 256-bit
+integer. After hard fork block, a contract is always signed with a
+`version`.
+
+If `version` is `0`, encode and sign the contract creation transaction
+with 9 fields, `nonce`, `gasprice`, `startgas`, `to`, `value`, `data`,
+`v`, `r`, `s`. If `version` is not `0`, encode and sign the contract
+creation transaction with 10 fields, `nonce`, `gasprice`, `startgas`,
+`to`, `value`, `data`, `v`, `r`, `s`, `version`.
+
+`v`, `r`, `s` are as defined by EIP-155. A contract creation
+transaction is valid if it is signed with 10 fields and with `version`
+field to 0.
+
+The transaction would be executed with the *code's version* in
+`version` supplied, and deploys contract of `version`. If `version` is
+not supported or *validation* does not pass, return out-of-gas.
+
+=== CREATE and CREATE2 Extension
+[spec]
+id: 45-VEROP
+description: Account Versioning Extension for CREATE and CREATE2
+discuss: https://ethereum-magicians.org/t/accounting-versioning/3508
+
+The base account versioning layer only allows contracts of the same
+version to be deployed through `CREATE` and `CREATE2`. In this
+section, we provide an extension to allow different versions of
+contracts to be deployed via them, by providing two new opcodes,
+`VCREATE` and `VCREATE2`.
+
+==== Specification
+
+Define two new opcodes `VCREATE` and `VCREATE2` at `0xf6` and `0xf7`
+respectively. `VCREATE` takes 4 stack arguments (version, value, input
+offset, input size), and `VCREATE2` takes 5 stack arguments (version,
+endowment, memory_start, memory_length, salt). Note that except the
+stack item `version`, other arguments are the same as `CREATE` and
+`CREATE2`.
+
+The two new opcodes behave identically to `CREATE` and `CREATE2`,
+except that it deploys contracts with version specified by stack item
+`version`.
+
+The network at all times maintains a constant list within the client
+of all deployable versions (which can be different from supported
+versions). Upon `VCREATE` and `VCREATE2`, if the specified `version`
+is not on the list of deployable versions, return out-of-gas.
+
+== Prefix-based Account Versioning
+[spec]
+id: 26-VER
+discuss: https://ethereum-magicians.org/t/accounting-versioning/3508
+
+=== Specification
+
+After `FORK_BLOCK`, before an account or contract creation transaction
+code is executed, check that whether:
+
+* The first byte is `\0` (`0x00`).
+* The code length is greater or equal to 4.
+
+If so, we define the second to fourth bytes as version bits. Instead
+of executing on the default EVM, pass the *whole* code array to a VM
+defined by the version bits.
+
+* If version bytes are `\0\0\1`, then invoke "EVM1", where the first 4
+  bytes are stripped, and the rest of the code bytes are executed in
+  an EVM with "EVM1" config.
+* If version bytes are `asm`, then invoke WebAssembly virtual
+  machine. This is compatible with the standard WebAssembly binary
+  format because it always starts with `\0asm`.
+
+If the above does not match, execute it on the default EVM. Note that
+if the first byte is `\0`, the client can short circuit and stop
+immediately.
+
+Additionally, if link:https://specs.corepaper.org/40-UNUSED[40-UNUSED]
+is deployed, before executing a contract creation transaction, or
+adding contract code to the state, do the following check:
+
+* Check whether the first byte is `\0`.
+  * If so, check whether the code length is greater or equal to 4. If
+    not, throw out of gas for the code deployment.
+  * Fetch version bytes as defined above, check whether the version
+    bytes are defined and active. If not, throw out of gas for the code
+    deployment.
