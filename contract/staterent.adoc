@@ -1,0 +1,97 @@
+= State Rent
+Wei Tang <@sorpaas>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[meta=description]
+This article discusses state rent, in particular, state rent with
+asynchronous garbage collection. Compared with traditional state rent
+with deterministic garbage collection, asynchrony allows more
+predictable block processing performance estimation, and freer node
+implementations.
+
+== Special Thanks
+
+The earliest state rent work is done by Alexey Akhunov, which highly
+inspired this article.
+
+== State Rent with Asynchronous Garbage Collection
+
+Consider a simple account-based blockchain like Ethereum or
+Substrate. The world state consists of _accounts_. Accounts consist of
+some basic information such as balance, nonce, code, together with an
+account storage. Over lifetime of a blockchain, the collection of
+accounts can become huge, while a lot of them remain unused. The goal
+of state rent is to recycle storage space occupied by unused accounts.
+
+Some state rent systems, like
+link:https://github.com/ledgerwatch/eth_state[the one proposed in
+Ethereum] Alexey Akhunov, uses a deterministic garbage collection
+routine for state rent. Accounts pay a certain amount of rent to exist
+for a period of time. This causes the account balances to gradually
+reduce. If the account balance is too low to pay the rent, it is
+marked to be evicted. An operational transaction is then due to
+deterministically evict the account out of the world
+state. Determinstic garbage collection presents some challenges:
+
+* Accounts constantly need to pay rent. While the number of times dues
+  happen can be optimized (to only pay it when an account is updated),
+  it still causes unnecessary state updates.
+* Eviction is costly. All accounts that need to be evicted must be
+  done so deterministically. While we can limit the number of
+  evictions per block, this can still cause massive merkle tree
+  updates.
+
+State rent with asynchronous garbage collection aims at solving those
+challenges.
+
+=== Protocol Rule
+
+Asynchronous garbage collection requires an *append-only merkle
+tree*. Existing accounts can be modified. However, new accounts can
+only be appended at the end of the merkle tree. Any index-based merkle
+tree is suitable for this purpose, but not key-value-based merkle
+tree. Below, we use index-based binary merkle tree to demostrate
+asynchronous garbage collection, but note that the same system can be
+used for hex merkle tree.
+
+The protocol rules that constraint block processing is as follows:
+
+* Each account has a _keep-alive_ period. Pre-defined operations on a
+  blockchain can extend an account's keep-alive period.
+* If an account is accessed after its _keep-alive_ period, the
+  transaction that accessed it must be accompanied with witness proof
+  of the account, with reinitiation fee and operations to reinitiate
+  the corresponding storage values. Otherwise, the whole transaction
+  fails with no state changes, other than consuming all gases.
+
+We don't explictly define garbage collection within protocol rules,
+but it enables the rules to be implemented in a node implementation.
+
+=== Garbage Collection
+
+Upon an account reaches its end of the _keep-alive_ period, a node
+implementation can safely (but optionally) evict it. It does so by
+removing the corresponding merkle node in the database, but no merkle
+hash change is required. Consider the following merkle tree, where we
+have a world state of 4 accounts `D`, `E`, `F`, `G`:
+
+[source,plain]
+----
+     A
+   /   \
+   B   C
+  / \ / \
+  D E F G
+----
+
+When `D` is evicted, no garbage collection is possible. Then, when `E`
+is evicted, merkle node `D` and `E` can be removed from database,
+leaving only `B`. No operation is able to modify evicted accounts and
+the merkle tree is append-only for new accounts, so `B` is fixed and
+will never be modified, unless `D` or `E` are reinitiated.
+
+If the node has not invoked garbage collection, then the node can use
+the account information to check _keep-alive_ period. If an access
+reaches an evicted node, then it knows that it must have passed the
+_keep-alive_ period, resulting in revertion of the transaction.
