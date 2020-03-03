@@ -89,7 +89,7 @@ When `D` is evicted, no garbage collection is possible. Then, when `E`
 is evicted, merkle node `D` and `E` can be removed from database,
 leaving only `B`. No operation is able to modify evicted accounts and
 the merkle tree is append-only for new accounts, so `B` is fixed and
-will never be modified, unless `D` or `E` are reinitiated.
+will never be modified, unless `D` or `E` is reinitiated.
 
 If the node has not invoked garbage collection, then the node can use
 the account information to check _keep-alive_ period. If an access
