@@ -12,7 +12,7 @@ implementations.
 
 == Special Thanks
 
-The earliest state rent work is done by Alexey Akhunov, which highly
+The earliest state rent work was done by Alexey Akhunov, which highly
 inspired this article.
 
 == State Rent with Asynchronous Garbage Collection
