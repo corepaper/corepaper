@@ -27,12 +27,12 @@ of state rent is to recycle storage space occupied by unused accounts.
 Some state rent systems, like
 link:https://github.com/ledgerwatch/eth_state[the one proposed in
 Ethereum] by Alexey Akhunov, uses a deterministic garbage collection
-routine for state rent. Accounts pay a certain amount of rent to exist
-for a period of time. This causes the account balances to gradually
-reduce. If the account balance is too low to pay the rent, it is
-marked to be evicted. An operational transaction is then due to
-deterministically evict the account out of the world
-state. Determinstic garbage collection presents some challenges:
+routine. Accounts pay a certain amount of rent to exist for a period
+of time. This causes the account balances to gradually reduce. If the
+account balance is too low to pay the rent, it is marked to be
+evicted. An operational transaction is then due to deterministically
+evict the account out of the world state. Determinstic garbage
+collection presents some challenges:
 
 * Accounts constantly need to pay rent. While the number of times dues
   happen can be optimized (to only pay it when an account is updated),
