@@ -1,0 +1,78 @@
+= Actor-based contract
+Wei Tang <@sorpaas>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[meta=description]
+Actor-based contract model aims at solving some of the outstanding
+issues in current call-based contract model in backward compatibility,
+fee payment and other areas.
+
+== Special thanks
+
+Special thanks to all the insightful discussions with Sergei Shulepov,
+and inspiration of prior work
+link:https://github.com/primea/design[Primea].
+
+== Account model
+
+Actor-based account model is based on the realization that contract
+invocations are of two completely different types, and they have
+different safety requirements:
+
+* *Library calls*: This invokes code as internal functionality, which
+   is trusted.
+* *External calls*: This invokes external contracts to send funds or
+   other information. It is not trusted.
+
+In actor-based account model, contracts send asynchronous messages to
+each other for external calls. The caller only pays the fees for
+sending and storing the message, while the receiver later handles the
+message execution themselves.
+
+Instead of one-type-fit-all account model like it is in Ethereum, in
+actor-based account model divides contracts into two different types:
+*actor contracts*, and *library contracts*.
+
+=== Library contracts
+
+Library contracts are code blocks that are specifically only designed
+for calling as libraries. Library contracts can only be invoked by
+other library contracts or actor contracts, and cannot be invoked by
+externally owned accounts. It has the following information:
+
+* *Code hash*: Code of the account.
+
+Note the explict omission of other information such as account
+balance, nonce, or storage values. Calling library contracts use
+specialized functions or opcodes, and any other invocations result in
+fatal error of the execution.
+
+=== Actor contracts
+
+Actor contracts are those that can be sent messages by externally
+owned accounts or other actor contracts. It has the following
+information:
+
+* *Basic*: This includes basic information such as account balance and
+   nonce.
+* *Code hash*: Code of the account.
+* *Child storage*: Storage values of the account.
+* *Messages*: Collection of unhandled messages sent to this contract.
+
+== Messages
+
+Messages are the asynchronous communication method for actor
+contracts. It has the following information:
+
+* *Sender*: The direct sender of the message, either another actor
+   contract or an externally owned account.
+* *Data*: Bytearray sent alongside the message, up to receiver's
+   interpretation.
+* *Balance*: Money sent alongside the message.
+
+== Actor message loop
+
+Message processing loop of actor contracts are handled separately in
+transactions. Those transactions can be signed by anyone, providing
+execution gas for the contract.
