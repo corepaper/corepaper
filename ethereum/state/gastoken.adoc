@@ -1,4 +1,4 @@
-= State Growth and GasToken Smart Contract
+= State growth and GasToken smart contract
 Wei Tang <@sorpaas>
 :license: Apache-2.0
 
@@ -16,7 +16,7 @@ propose solutions to fix the issue or at least to slow down the
 growth. This article provides some reviews and feedbacks on those
 proposed solutions.
 
-== Reduce Block Gas Limit
+== Reduce block gas limit
 
 The major issue of contracts like GasToken is that it causes fast
 state size growth. One of the simplest method to limit state size
@@ -34,7 +34,7 @@ of the block to be filled with GasToken transactions, and users will
 have to pay higher gas price to get their non-GasToken transactions
 through.
 
-== Remove Gas Refund
+== Remove gas refund
 
 GasToken takes advantage of the EVM mechanic of gas refund. As a
 result, some community members started to talk about removing the gas
@@ -53,7 +53,7 @@ GasToken contracts' utility of "save gas now, spend it later" can be
 fulfilled by specialized smart contracts without using the gas refund
 mechanic.
 
-=== The Mechanic
+=== Mechanic
 
 Gas refund is a way to remove gas cost for an operation. It presents
 on two opcodes:
@@ -81,7 +81,7 @@ From above, we can see that:
   *absolute cost* of at least 8000 gas. The cost will be 24000 more if
   the contract is not later destructed.
   
-=== Absolute Cost
+=== Absolute cost
 
 This allows us to draw the absolute cost table:
 
@@ -134,7 +134,7 @@ table.
 | Create but not destruct | 56000             |
 |===
 
-=== Work Around Gas Refund
+=== Work around gas refund
 
 The utility GasToken provides can be stated as follows -- spend some
 gases, you can save a portion of them now, and spend them later when

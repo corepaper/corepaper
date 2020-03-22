@@ -1,4 +1,4 @@
-= Feature Upgrade
+= Feature upgrade
 Wei Tang <@sorpaas>
 :license: Apache-2.0
 
@@ -9,7 +9,7 @@ Ethereum Classic.
 Feature upgrades in Ethereum and Ethereum Classic are usually
 conducted through *hard fork*.
 
-== Hard Fork
+== Hard fork
 
 Hard fork feature upgrade process requires all participating nodes to
 be updated. This certainly requires a lot of coordination. As a
@@ -43,7 +43,7 @@ over-engineering, and block timestamp might be gamed by miners.
 For controversial features, the hard fork process had used
 *signaling*.
 
-== Soft Fork
+== Soft fork
 
 Soft fork is a feature upgrade process that does not require all nodes
 to be updated. This is done by making upgraded nodes execute on a more
@@ -63,7 +63,7 @@ soft forks. Otherwise, denial of service attacks will be possible.
 Signaling allows everyone who participate in the coin to vote on
 whether a particular feature upgrade should happen.
 
-=== Carbon Voting Process
+=== Carbon voting process
 
 Carbon vote allows coin holders to signal their preferences. One coin,
 one vote. Non-enforced carbon vote had happened in the past. The first
@@ -77,7 +77,7 @@ Specifications for enforced carbon vote proposals have also been
 writte, such as
 link:https://specs.that.world/28-carbonvote/[28-CARBONVOTE].
 
-=== Miner Voting Process
+=== Miner voting process
 
 *Proposals: link:https://specs.that.world/27-minervote/[27-MINERVOTE]*
 
@@ -98,7 +98,7 @@ optionally bind it to an actual upgrade process. Once enough miners
 signal support, an upgrade will happen automatically. Those are
 processes such as 27-MINERVOTE.
 
-=== Generalized Voting Process
+=== Generalized voting process
 
 *Proposals: link:https://specs.that.world/36-statevote/[36-STATEVOTE]*
 

@@ -1,4 +1,4 @@
-= Ethereum Compatibility Layer
+= Ethereum compatibility layer
 Wei Tang <@sorpaas>
 :license: CC-BY-SA-4.0
 :license-code: Apache-2.0
@@ -15,7 +15,7 @@ The goal of Ethereum compatibility layer is to be able to:
 
 == Scope
 
-=== Types of Dapps
+=== Types of dapps
 
 We consider three different types of dapps:
 
@@ -39,12 +39,12 @@ without private keys_, but is simpler.
 
 == Runtime
 
-=== EVM Pallet
+=== EVM pallet
 
 The module would handle the essence of EVM invocations, and is
 implemented as `pallet-evm`.
 
-==== State Import
+==== State import
 
 NOTE: This section describes something that has not yet been
 implemented.
@@ -52,7 +52,7 @@ implemented.
 The pallet should be able to directly import state, both in genesis
 config, and through `sudo` transactions.
 
-=== Ethereum Pallet
+=== Ethereum pallet
 
 NOTE: This section describes something that has not yet been
 implemented.
@@ -72,7 +72,7 @@ The module will have at least the following extrinsics:
   to sr25519 keys, or it can be configured to skip secp256k1 signature
   verification at all.
 
-== RPC Module
+== RPC module
 
 NOTE: This section describes something that has not yet been
 implemented.

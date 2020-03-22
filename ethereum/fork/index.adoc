@@ -1,4 +1,4 @@
-= Hard Fork
+= Hard fork
 Wei Tang <@sorpaas>
 :license: Apache-2.0
 

@@ -1,4 +1,4 @@
-= Istanbul Hard Fork
+= Istanbul hard fork
 Wei Tang <@sorpaas>
 :license: Apache-2.0
 
@@ -49,7 +49,7 @@ called **Aztlan (Yingchun)**.
 We gathered one review of *consideration*, and two categorized as
 *design failure*.
 
-==== Trie Access Underprice
+==== Trie access underprice
 
 *Consideration*
 
@@ -82,7 +82,7 @@ cannot take advantage of any Istanbul features.
 **Recommendation**: Create a specification that applies `SELFBALANCE`
 opcode standalone, and add it to the hard fork specification list.
 
-==== Inconsistency in Net Gas Metering
+==== Inconsistency in net gas metering
 
 *Design Failure*
 
@@ -117,7 +117,7 @@ list, and add EIP-1283 with EIP-1706 instead.
 In this section, we provide several specifications to address
 currently known review issues.
 
-==== Standalone Self Balance
+==== Standalone SELFBALANCE
 [spec]
 id: 50-SELFBALANCE
 discuss: https://github.com/corepaper/corepaper/issues/3
@@ -134,7 +134,7 @@ A new opcode, `SELFBALANCE` is introduced at `0x47`.
   stack,
 * `SELFBALANCE` is priced as GasFastStep, at 5 gas.
 
-==== Aztlan Fix
+==== Aztlan fix
 [spec]
 id: 49-AZTLANFIX
 description: Aztlan Fix Hard Fork
@@ -151,7 +151,7 @@ After `HARD_FORK_BLOCK`, apply the following changes:
 * Disable EIP-2200, and enable EIP-1283 with EIP-1706.
 * Enable https://specs.corepaper.org/50-selfbalance[50-SELFBALANCE].
 
-==== Aztlan Redo
+==== Aztlan redo
 [spec]
 id: 51-AZTLANREDO
 description: Aztlan Redo Hard Fork

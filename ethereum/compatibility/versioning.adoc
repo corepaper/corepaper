@@ -1,4 +1,4 @@
-= Account Versioning
+= Account versioning
 Wei Tang <@sorpaas>
 :license: CC0-1.0
 
@@ -22,7 +22,7 @@ against some particular contracts, then the scheme defined here might
 still be applicable. Otherwise, having a plain emergency hard fork
 might still be a good idea.
 
-== State-based Account Versioning
+== State-based account versioning
 
 === Specification
 [spec]
@@ -30,7 +30,7 @@ id: 43-VER
 description: Generalized Account Versioning Scheme
 discuss: https://ethereum-magicians.org/t/accounting-versioning/3508
 
-==== Account State
+==== Account state
 
 Re-define account state stored in the world state trie to have 5
 items: `nonce`, `balance`, `storageRoot`, `codeHash`, and
@@ -48,7 +48,7 @@ RLP fields, whose meaning are specified through its `version`
 field. In those cases, the parsing strategy is defined in "Additional
 Fields in Account State RLP" section.
 
-==== Contract Execution
+==== Contract execution
 
 When fetching an account code from state, we always fetch the
 associated version field together. We refer to this as the *code's
@@ -59,7 +59,7 @@ In particular, this means that for `DELEGATECALL` and `CALLCODE`, the
 version of the execution call frame is the same as
 delegating/receiving contract's version.
 
-==== Contract Deployment
+==== Contract deployment
 
 In Ethereum, a contract has a deployment method, either by a contract
 creation transaction, or by another contract. If we regard this
@@ -87,7 +87,7 @@ that has to be passed.
 If the validation phrase fails, deployment does not proceed and return
 out-of-gas.
 
-==== Contract Creation Transaction
+==== Contract creation transaction
 
 Define `LATEST_VERSION` in a hard fork to be the latest supported VM
 version. A contract creation transaction is always executed in
@@ -96,7 +96,7 @@ version. A contract creation transaction is always executed in
 contract creation transaction is executed, run *validation* on the
 contract creation code. If it does not pass, return out-of-gas.
 
-==== Precompiled Contract and Externally-owned Address
+==== Precompiled contract and externally-owned address
 
 Precompiled contracts and externally-owned addresses do not have
 `version`. If a message-call transaction or `CALL` / `CALLCODE` /
@@ -104,7 +104,7 @@ Precompiled contracts and externally-owned addresses do not have
 or a non-existing precompiled contract address, it is always created
 with `version` field being `0`.
 
-==== Additional Fields in Account State RLP
+==== Additional fields in account state RLP
 
 In the future we may need to associate more information into an
 account, and we already have some EIP/ECIPs that define new additional
@@ -121,7 +121,7 @@ parsing strategy when additional fields are added.
   * Parse RLP position `5` to `4 + N` as the meaning specified in
     additional fields.
 
-==== Usage Template
+==== Usage template
 
 This section defines how other specifications might use this account
 versioning. Note that currently we only define the usage
@@ -170,9 +170,9 @@ virtual machine. In that case, WASM contracts and EVM contracts can
 co-exist and the execution boundary and interaction model are clearly
 defined as above.
 
-== Extensions for State-based Account Versioning
+== Extensions for state-based account versioning
 
-=== Contract Creation Transaction Extension
+=== Contract creation transaction extension
 [spec]
 id: 44-VERTXN
 description: Account Versioning Extension for Contract Creation Transaction
@@ -206,7 +206,7 @@ The transaction would be executed with the *code's version* in
 `version` supplied, and deploys contract of `version`. If `version` is
 not supported or *validation* does not pass, return out-of-gas.
 
-=== CREATE and CREATE2 Extension
+=== CREATE and CREATE2 extension
 [spec]
 id: 45-VEROP
 description: Account Versioning Extension for CREATE and CREATE2
@@ -236,7 +236,7 @@ of all deployable versions (which can be different from supported
 versions). Upon `VCREATE` and `VCREATE2`, if the specified `version`
 is not on the list of deployable versions, return out-of-gas.
 
-== Prefix-based Account Versioning
+== Prefix-based account versioning
 [spec]
 id: 26-VER
 discuss: https://ethereum-magicians.org/t/accounting-versioning/3508

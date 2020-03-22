@@ -1,4 +1,4 @@
-= Legacy Opcode Repricing
+= Legacy opcode repricing
 Wei Tang <@sorpaas>
 :license: Apache-2.0
 
@@ -10,7 +10,7 @@ This section discusses the general approach of doing opcode gas cost
 repricing backward-compatibly, in a set up where multiple EVM versions
 exist, using methods such as account versioning.
 
-== Problem Definition
+== Problem definition
 
 Each EVM opcode has an associated gas cost. Cost of the opcode is
 deducted. It is then multiplied by a given gas price, to give out the
@@ -39,7 +39,7 @@ This is the problem this article tries to discuss and provide
 solutions for. How do we apply opcode repricing and emergency hard
 forks in a backward compatible way?
 
-== Account Versioning
+== Account versioning
 
 Account versioning is one of the most important solutions to solve
 backward compatibility issues. The following discussions about opcode
@@ -62,7 +62,7 @@ Applying gas repricing directly on legacy version will cause backward
 compatibility issues, and the goal of this article is to explain a
 method to apply repricing without breaking anything.
 
-== Miners, Gas Price and Block Gas Limit
+== Miners, gas price and block gas limit
 
 Ultimately, the miner decides which transaction to be included on
 chain. Within those transactions are the EVM executions that takes
@@ -83,7 +83,7 @@ cost (in ether), where the value is roughly a constant at any given
 point of time. The computation time to execute `L` will be roughly the
 tolerable time to execute the block.
 
-== Relativity of Gas Cost
+== Relativity of gas cost
 
 If we double, triple, or reduce it by half of all gas cost functions,
 the functionality does not change. For example, when we change all gas
@@ -98,7 +98,7 @@ In other words, what is important for an opcode's gas cost is how it
 is relative to other opcode's. The absolute value of the gas cost does
 not affect functionality.
 
-== Conducting Gas Repricing
+== Conducting gas repricing
 
 With the above, in this section we discuss how the actual gas
 repricing happens. The procedure is roughly like follows, considering
@@ -132,7 +132,7 @@ legacy version.
 
 == Discussions
 
-=== Complexity of Decreasing Gas Cost
+=== Complexity of decreasing gas cost
 
 The method discussed above involves some complexity, mostly due to the
 systematic decrease of gas cost. The complexity can be reduced by not

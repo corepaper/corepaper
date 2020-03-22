@@ -7,12 +7,12 @@ Wei Tang <@sorpaas>
 In this section, we define Solri's execution environment and initial
 runtime.
 
-== Execution Environment
+== Execution environment
 
 The following section defines how the execution environment for Solri
 works.
 
-=== Memory Management
+=== Memory management
 
 A WebAssembly instance for Solri is expected to handle its own memory
 management. The instance is expected to be long-standing, and might
@@ -40,7 +40,7 @@ The guest should also exports the following functions:
 * `fn free()`: frees wrote code, block parameters, and metadata
   result, if any.
 
-=== Block Execution
+=== Block execution
 
 This section defines the `execute` export, which exposes the method to
 execute a block for a runtime, assuming parent block provided and code
@@ -102,7 +102,7 @@ functions. A typical cycle looks like below:
   result from guest back to host.
 * Call `free` to deallocate parameters and results.
 
-== Timestamp Validation and Fork Choice
+== Timestamp validation and fork choice
 
 When mining, it is always expected that the miner uses a client whose
 native version supports the current WebAssembly runtime. In this case,
@@ -118,7 +118,7 @@ total difficulty. Notice that although we don't limit what the PoW
 algorithm is, the fork choice rule is indeed limited by total
 difficulty, to ensure backward compatibility.
 
-== Initial Runtime and Block Structure
+== Initial runtime and block structure
 
 The actual `runtime` (which exposes `execute`) function is expected to
 be stateless. Notice we don't provide any imports for the execution
@@ -129,7 +129,7 @@ All below structures are stored in binary merkle tree (`bm` is the
 reference implementation), and encoded via SCALE (`parity-codec` is
 the reference implementation).
 
-=== Types and Structures
+=== Types and structures
 
 We define `State`, which consists of the following structures:
 
@@ -210,7 +210,7 @@ struct Block {
 }
 ----
 
-=== Block Execution
+=== Block execution
 
 * **Validity of Proof of Work Proof**: Upon receiving a new block
   structure, the executor should first decode `difficulty` and

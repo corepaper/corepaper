@@ -1,4 +1,4 @@
-= Computation Strategies
+= Computation strategies
 Wei Tang <@sorpaas>
 :license: CC-BY-SA-4.0
 :license-code: Apache-2.0
@@ -7,7 +7,7 @@ Wei Tang <@sorpaas>
 In this section, we list some common computation strategies for
 on-chain processing.
 
-== Stop-the-world Computation
+== Stop-the-world computation
 
 Stop-the-world computation represents a kind of computation where we
 need to iterate over the full account list. In this case, because the

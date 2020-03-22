@@ -1,4 +1,4 @@
-= Leaky Abstraction of Gas
+= Leaky abstraction of gas
 Wei Tang <@sorpaas>
 :license: CC-BY-SA-4.0
 :license-code: Apache-2.0
@@ -25,7 +25,7 @@ versioning. Even if retracting gas cost is hard, according to Hyrum's
 Law, smart contracts will still choose to depend on it, if they can,
 and thus results in unexpected breakage.
 
-== Gas Cost Deduction from Account Balance
+== Gas cost deduction from account balance
 
 The essence of the leaky abstraction is from the observation that gas
 cost has to interact with transaction fees, and thus interact with
@@ -50,7 +50,7 @@ versioning because contracts have to access states. Because of
 transaction fees, the information of gas cost is inevitably leaked
 to EVM.
 
-== Reasonable Backward and Forward Compatibility
+== Reasonable backward and forward compatibility
 
 Leaky abstraction of gas results in that _complete_ backward and
 forward compatibility is impossible -- it's always possible to design

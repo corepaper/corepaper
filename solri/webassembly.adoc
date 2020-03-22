@@ -8,7 +8,7 @@ This defines the WebAssembly execution environment for
 Solri. Solri-flavored WebAssemly is a subset of WebAssembly that is
 deterministic.
 
-== Design Principles
+== Design principles
 
 We still aim to maintain WebAssembly's goal of open web platform --
 Solri-flavored WebAssembly maintains to be versionless,
@@ -32,7 +32,7 @@ situation where chains can split -- older clients will not be able to
 execute any possible blocks on the current runtime, nor build any
 blocks.
 
-== Value Types
+== Value types
 
 Solri-flavored WebAssembly supports the following value types:
 
@@ -158,7 +158,7 @@ That is, all MVP instructions with floating point instructions
 disabled. Practically, this means that the execution environment
 should check that none of the floating point instructions exist.
 
-== Module Sections
+== Module sections
 
 The following sections are allowed in Solri-flavoured WebAssembly:
 

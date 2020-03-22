@@ -1,4 +1,4 @@
-= Mining Algorithms
+= Mining algorithms
 Wei Tang <@sorpaas>
 :license: Apache-2.0
 
@@ -12,7 +12,7 @@ algorithm, ethash, to something else. We first discuss some of the
 proposals, and then discuss some general issues in switching
 algorithms.
 
-== Switching Algorithms
+== Switching algorithms
 
 Many proposals have been made to switch the currently used mining
 algorithms.
@@ -22,7 +22,7 @@ algorithms.
 Those set of proposals focus on doing small tweaks on Ethash, but
 still maintain most of the original algorithm design.
 
-==== For ASIC Resistance
+==== For ASIC resistance
 
 *Proposals: link:https://eips.ethereum.org/EIPS/eip-1355[EIP-1355],
 link:https://eips.ethereum.org/EIPS/eip-1485[EIP-1485]*
@@ -36,7 +36,7 @@ the current specifications, thus can claim to be low risk.
 However, criticism says that current ASICs can easily adopt those new
 algorithm changes.
 
-==== For Hardware Inclusion
+==== For hardware inclusion
 
 Proposals of this kind limit the DAG size. Originally, DAG size growth
 is to provide ASIC resistance. However, it's currently growing over
@@ -56,7 +56,7 @@ Another group of people think ASIC resistance is impossible, and maybe
 even harmful to accomplish. Some proposals attempt to switch to an
 ASIC friendly algorithm Keccak256.
 
-== Difficulty Bomb
+== Difficulty bomb
 
 *Proposals: link:https://eips.ethereum.org/EIPS/eip-649[EIP-649],
 link:https://eips.ethereum.org/EIPS/eip-1234[EIP-1234]*
@@ -70,7 +70,7 @@ Ethereum Classic has delayed the difficulty bomb once, and finally
 ended up removing it. Ethereum has delayed the difficulty bomb twice,
 and is still counting today.
 
-== Issues in Signaling
+== Issues in signaling
 
 Switching mining algorithms is usually a controversial topic. As a
 result, some form of signaling is required. The most commonly adopted
@@ -87,7 +87,7 @@ Methods to fix this issue includes:
 * Use other methods of voting, such as carbon vote, or do not do any
   form of signaling at all.
 
-== Issues in Difficulty Adjustment
+== Issues in difficulty adjustment
 
 Difficulty of different mining algorithms are not comparable, because
 the time to calculate one hash of different algorithms in commodity

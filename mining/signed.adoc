@@ -1,4 +1,4 @@
-= Signed Mining
+= Signed mining
 Wei Tang <@sorpaas>
 :license: Apache-2.0
 

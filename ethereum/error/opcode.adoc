@@ -1,4 +1,4 @@
-= Opcode-specific Error Handling
+= Opcode-specific error handling
 Wei Tang <@sorpaas>
 :license: Apache-2.0
 
@@ -20,7 +20,7 @@ This cleans up the long-standing issue that arithmetic opcodes in EVM
 silently warps when overflowing. This has turned out to be a security
 issue, with known exploit happened in the past.
 
-== Consistent Copy-to-memory Behavior
+== Consistent copy-to-memory behavior
 [spec]
 id: 47-CPYM
 discuss: https://github.com/corepaper/corepaper/issues/2
@@ -57,7 +57,7 @@ This specification does not change the behavior of `CALL`, `CALLCODE`,
 buffer to memory. It has a specific behavior that the length copied is
 `min(stack(out_len), buffer_len)`.
 
-== Explicit Memory Growth
+== Explicit memory growth
 [spec]
 id: 48-GROWM
 discuss: https://github.com/corepaper/corepaper/issues/2

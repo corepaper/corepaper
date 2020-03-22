@@ -1,4 +1,4 @@
-= Execution Frame Error Handling
+= Execution frame error handling
 Wei Tang <@sorpaas>
 :license: Apache-2.0
 
@@ -40,7 +40,7 @@ The current error handling semantics have several issues:
   out-of-gas, or other subtle EVM execution details. This makes the
   threat model for smart contracts complicated.
 
-== Fatal Error as Default
+== Fatal error as default
 
 *Proposals: https://specs.corepaper.org/39-ungas[39-UNGAS]*
 
@@ -51,7 +51,7 @@ recoverable error through an explicit `REVERT`. The complete
 specification of this is described as part of
 <<../compatibility/forward.adoc#,Forward-compatible EVM>>.
 
-== Explicit Checkpointing
+== Explicit checkpointing
 [spec]
 id: 46-CHECKPOINT
 discuss: https://github.com/corepaper/corepaper/issues/2

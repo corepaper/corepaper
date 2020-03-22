@@ -1,4 +1,4 @@
-= Backward Compatibility
+= Backward compatibility
 Wei Tang <@sorpaas>
 :license: Apache-2.0
 
@@ -10,7 +10,7 @@ In this section, we discuss the issue of backward compatibility. We
 first give an overview of the definition, the issue behind the
 definition, and then go on to discuss various proposals.
 
-== Definition and Spectrum
+== Definition and spectrum
 
 In the context of Ethereum, backward compatibility means that when new
 feature upgrades or hard forks are deployed, existing on-chain smart
@@ -55,7 +55,7 @@ limit issue* now. Some argued that because Ethereum is still an
 experiment, we can still afford breaking smart contracts and move on,
 while others argued that the issue should be addressed now.
 
-== Account Versioning
+== Account versioning
 
 Account versioning is the primary and fundamental way to address
 backward compatibility issues. Multiple account versioning proposals
@@ -64,7 +64,7 @@ all on-chain smart contracts with version numbers. With this version
 number, we can enable different EVM rules when executing code under
 different version numbers, and thus ensure backward compatibility.
 
-=== Code Prefix
+=== Code prefix
 
 *Proposals: https://specs.that.world/26-ver/[26-VER],
 https://github.com/ethereum/EIPs/issues/154[EIP-154],
@@ -81,7 +81,7 @@ accidentally or intentionally have the code prefix. If a validation
 process is added together with a code prefix, then that validation
 process can be bypassed completely, thus creating security issues.
 
-### RLP Fields
+=== RLP fields
 
 *Proposals: https://specs.that.world/43-ver/[43-VER],
 https://eips.ethereum.org/EIPS/eip-1702[EIP-1702]*
@@ -115,7 +115,7 @@ this variation lies in performance -- after the change, all contract
 state access must have one additional trie access to the special
 contract, in order to fetch the version.
 
-=== Considerations on Contract Creations
+=== Considerations on contract creations
 
 *Proposals: https://specs.that.world/44-vertxn/[44-VERTXN],
 https://specs.that.world/45-verop/[45-VEROP],
@@ -133,13 +133,13 @@ contract, or to always be the latest version. Extensions like
 44-VERTXN, 45-VEROP, and `VCREATE` exists to allow additional
 information to be passed for version in contract creation process.
 
-== Forward Compatibility
+== Forward compatibility
 
 Account versioning solves most of the backward compatibility
 issues. However, with account versioning alone, we will require too
 much engineering efforts.
 
-=== EVM Forward Compatibility
+=== EVM forward compatibility
 
 The Ethereum and Ethereum Classic hard fork schedule is usually every
 6 months. If we adopt account versioning alone, we will need to
@@ -148,7 +148,7 @@ sustainable. Proposals to address this issue have been proposed, to
 make the EVM forward-compatible. See [Forward-compatible
 EVM](./forward.md) for more discussions on this issue.
 
-=== Solidity Postfix
+=== Solidity postfix
 
 *Proposals: https://eips.ethereum.org/EIPS/eip-2327[EIP-2327]*
 
@@ -178,7 +178,7 @@ forward-compatible version, without defining any new versions.
 Only requiring two versions will help a lot in terms of reducing
 engineering complexity.
 
-==== Legacy Repricing and Encouraging Usage of Forward Compatible Version
+==== Legacy repricing and encouraging usage of forward compatible version
 
 This is further discussed in a <<legacy-repricing.adoc#,standalone
 article>>.

@@ -1,4 +1,4 @@
-= State Rent
+= State rent
 Wei Tang <@sorpaas>
 :license: CC-BY-SA-4.0
 :license-code: Apache-2.0
@@ -10,12 +10,12 @@ with deterministic garbage collection, asynchrony allows more
 predictable block processing performance estimation, and freer node
 implementations.
 
-== Special Thanks
+== Special thanks
 
 The earliest state rent work was done by Alexey Akhunov, which highly
 inspired this article.
 
-== State Rent with Asynchronous Garbage Collection
+== State rent with asynchronous garbage collection
 
 Consider a simple account-based blockchain like Ethereum or
 Substrate. The world state consists of _accounts_. Accounts consist of
@@ -68,7 +68,7 @@ The protocol rules that constraint block processing is as follows:
 We don't explictly define garbage collection within protocol rules,
 but it enables the rules to be implemented in a node implementation.
 
-=== Garbage Collection
+=== Garbage collection
 
 Upon an account reaches its end of the _keep-alive_ period, a node
 implementation can safely (but optionally) evict it. It does so by

@@ -8,7 +8,7 @@ Gas metering in Ethereum is used to calculate the cost of a particular
 contract execution. This article discusses improvements we can do to
 make metering better.
 
-== Miner-controlled Metering
+== Miner-controlled metering
 [spec]
 id: 54-MMETER
 discuss: https://github.com/corepaper/corepaper/issues/5
