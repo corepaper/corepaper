@@ -1,0 +1,166 @@
+= Wrapper block
+Wei Tang <@sorpaas>
+:license: CC-BY-SA-4.0
+
+[meta=description]
+Wrapper block is a strategy in Substrate to allow it processing blocks
+that were not originally designed with Substrate in mind.
+
+== Background and overview
+
+In general, blockchains implemented in Substrate only have to
+implement the `Block` trait. It then can be used in most Substrate
+libraries, as they only make asumptions on the trait. However,
+completely implementing the trait from scratch is not simple, so
+Substrate also provides a generic `Block` struct that implements the
+`Block` trait.
+
+Substrate makes some assumptions about terminologies. Block header
+data is always either directly from state processing, or sealable by
+consensus engines. All external inputs are put in block bodies,
+groupped as "extrinsics", where unsigned ones are called "inherents",
+and signed ones are called "transactions". This design sometimes
+cannot directly be translated from blockchains that weren't designed
+with Substrate in mind. For example, Ethereum's block extra data is an
+unsigned external input, where in Substrate's design should be placed
+as inherents, yet it's in Ethereum's block header.
+
+Wrapper block is a strategy in Substrate to make those blockchains
+work with Substrate easily. For any "external block" on those
+blockchains, a wrapper block is created, which has a strict one-to-one
+mapping with the external block. Substrate then mainly works with the
+wrapper blocks, communicating with other Substrate nodes using those
+wrapper blocks. When external operation is needed, for example, to
+communicate with a non-Substrate node, the wrapper block is converted
+back to a external block.
+
+=== Substrate generic block
+
+The generic block header in Substrate contains the parent hash,
+number, state root, extrinsics root, and additional header
+digests. The generic block contains the block header, and data of
+extrinsics.
+
+=== Conversion and extra information
+
+The two-way conversion of external blocks and wrapper blocks should be
+strictly one-to-one mapping. However, the conversion is not required
+to be cheap, meaning wrapper blocks can contain extra information in
+Substrate's state.
+
+Given a wrapper block, and the corresponding Substrate state, the node
+must be able to produce an external block. Given an external block,
+the node must be able to locate the parent external block's
+corresponding wrapper block, import the external block and produce a
+new wrapper block.
+
+=== Support in Substrate
+
+For wrapper blocks to work, some notable features in Substrate needed
+are:
+
+* *Child trie*: External blocks' state processing logic is something
+  that must be followed, and one of the most important thing in those
+  logic is how external blocks' state roots are calculated. Child trie
+  feature in Substrate allows extra merkle trie structure, different
+  than the main one used in Substrate, to be defined.
+* *Custom indexing*: Given an external block hash, Substrate node must
+  be able to locate the wrapper block, if it has already been
+  imported. Note that this feature has not yet been implemented.
+
+=== Substrate pallets
+
+Substrate has the pallet framework which significantly simplifies
+runtime development. However, when using wrapper block strategy,
+pallets usually cannot be used.
+
+=== Limitations
+
+* *Performance*: It is understandable that because of the existence of
+  wrapper block, it adds slight overhead and impacts performance.
+* *Consensus validation*: The seal of the wrapper block has the
+  pre-hash of the external block. As a result, while the seal can be
+  pre-validated against its pre-hash, it cannot be pre-validated
+  against the full header, if the external block is not yet
+  known. This can however be simply fixed, by communicating the
+  wrapper block alongside the external block.
+
+== Ethereum
+
+This section is an example how the wrapper block strategy can be used
+to process Ethereum blocks.
+
+=== Block and extrinsic definitions
+
+The wrapper block header is defined as follows:
+
+* *Header parent hash*: Wrapper block's header parent hash.
+* *Number*: Block number, the same in the wrapper block and the
+  external block.
+* *State root*: Wrapper block's state root.
+* *Extrinsics root*: Wrapper block's extrinsics root.
+* *Digests*: Contains the block difficulty and PoW seal data.
+
+The following inherent extrinsics are defined:
+
+* *Timestamp*: Current block's timestamp.
+* *Gas limit*: Block's gas limit.
+* *Coinbase*: Block author information.
+* *Uncles*: Block uncle data.
+* *External parent hash*: External block's parent hash.
+
+Transaction extrinsics are the same as transactions in the external
+blocks.
+
+=== Runtime state
+
+The runtime state contains the following keys:
+
+* *Receipts*: List of transaction receipts processed in current block.
+* *Bloom*: The logs bloom of the current block.
+* *Gas used*: Gas used information of the current block.
+* *State*: The entire world state of the Ethereum block, stored in a
+  child trie, using Ethereum merkle trie data structure.
+
+=== Convert wrapper blocks to external blocks
+
+To reconstruct the external block from the corresponding wrapper
+block:
+
+* Retrieve parent hash, uncles, coinbase, transactions, gas limit,
+  timestamp and extra data from extrinsics.
+* Retrieve world state root, receipts, bloom and gas used from
+  Substrate state.
+* Retrieve difficulty, number and seal from header.
+
+=== Runtime processing
+
+The processing rules contain the following steps, assuming an external
+block `E` is received:
+
+* Upon finished processing the previous block (or the genesis block),
+  its external block's hash is indexed.
+* Use the external block's parent hash as the index, to locate the
+  parent wrapper block `WP`.
+* Create an empty wrapper block `W`, set its parent hash to `WP`'s
+  hash, and number to the next integer of `WP`'s number. Copy `E`'s
+  difficulty and PoW seal data to digests.
+* Copy `E`'s timestamp, gas limit, coinbase and uncles as `W`'s
+  inherent extrinsics.
+* Copy `E`'s transaction as `W`'s transaction extrinsics.
+
+At this time we have a wrapper block ready for runtime processing:
+
+* Validate each transactions' signature, execute EVM, produce receipts
+  and update receipt list, bloom and gas used in Substrate's state.
+* Process Ethereum's block finalization rules.
+* Update `W`'s state root and extrinsics root.
+
+For consensus engine:
+
+* Prior to runtime processing of `W`, if the external block is in
+  hand, validate the header against the difficulty and the seal. If
+  not, validate the pre-hash against the difficulty and the seal.
+* After runtime processing of `W`, if the external block was not
+  available, reconstruct the external block, and validate the header
+  against the difficulty and the seal.
