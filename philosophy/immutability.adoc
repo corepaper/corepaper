@@ -1,0 +1,69 @@
+= Immutability
+Wei Tang <@sorpaas>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+This opinioned article aims to explore the "immutability" concept in
+regards of blockchains. The goal is to provide a practical definition
+of "immutability" that can be followed, and discuss how to design
+blockchains to maintain backward compatibility.
+
+The idea we are exploring here uses the concept of _state graph_ --
+transactions that touch state modified by prior
+transactions. Immutability is then defined in regards of a hard fork,
+that potential state graphs already formed by past transactions do not
+change.
+
+== Concept
+
+In this section, we define two concepts _callable transaction_ and
+_state graph_.
+
+=== State graph
+
+A blockchain is a collection of transactions. Each transaction affects
+the state of the blockchain. Those affected states can then further be
+modified by future transactions. Given one single transaction **T**,
+we define the potential state graphs that all future transactions can
+touch, base on **T**, to be the transaction state graph of **T**.
+
+The state graph is easy to be defined in UTXO systems. For
+account-based systems, transactions modify what is often called the
+shared _world state_. Any future transactions that touch a prior
+transaction's modified world state is affected by it.
+
+To given the example of Ethereum, two types of primitives exist --
+_function calls_ and _contract creations_, forming
+transactions. Function calls modify an accounts balance and storage
+values. Contract creations modify contract code of the world
+state. Given transaction **T**, any future transactions that inspect
+or modify the balance, storage value, or contract code touched by
+**T** form **T**'s transaction state graph.
+
+=== Callable transaction
+
+A transaction is callable if there exists valid parameters of a block
+that can include the transaction. Note that a callable transaction
+defines its potential, but not immediacy. A block may contain a
+relatively low block gas limit that renders including some
+transactions not possible, but when the gas limit raises in the
+future, the transaction can be included.
+
+== Definition
+
+With the concept of _callable transaction_ and _state graph_, we can
+define immutability.
+
+> Before and after a hard fork, the state graph formed by all callable
+  transactions of all past transactions already on the blockchain
+  should not change.
+
+== Designing blockchains
+
+The obvious benefit of having a definition of immutability is
+_backward compatibility_, ensuring that protocol developers can add
+new features to the blockchain freely, while not breaking past smart
+contracts already there. Hard forks can be thought as adding
+additional possibilities of state graphs, while not modifying any
+existing ones. The added state graphs may be interleaved with
+pre-hard-fork state graphs _after_ the hard fork, but not _before_.
