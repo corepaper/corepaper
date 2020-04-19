@@ -1,0 +1,28 @@
+= Voluntary issurance
+Wei Tang <@sorpaas>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[meta=description]
+Issurance design has been one of the primary things that governance
+system of a blockchain has to decide. Issurance comes in varities of
+forms, from halving, to tail emissions, to constant supplies. In this
+article, we try to explore a different method -- to allow multiple
+different issurance bodies to co-exist within a blockchain, and to
+allow them to be created and followed at will. If no issurance curve
+can last for a hundred years, then do not have a fixed one.
+
+== Design
+
+A blockchain following voluntary issurance does not have a fixed
+"coin". Instead, all coins are managed as on-chain smart contracts.
+
+The protocol does not have fixed rules regarding transaction
+inclusion. Miners choose which transaction to include. A transaction
+allows sending funds to multiple targets, and includes an option to
+use the parameter of "coinbase". Miners voluntarily choose to
+interpret those options as transaction fees and use them to order
+transactions.
+
+Genesis block includes a transaction that deploys the first issurance
+body on-chain.
