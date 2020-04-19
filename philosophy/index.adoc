@@ -1,0 +1,7 @@
+= Philosophy
+Wei Tang <@sorpaas>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[meta=description]
+Those are some philosophical articles about blockchain designs.
