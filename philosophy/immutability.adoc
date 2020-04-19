@@ -3,6 +3,7 @@ Wei Tang <@sorpaas>
 :license: CC-BY-SA-4.0
 :license-code: Apache-2.0
 
+[meta=description]
 This opinioned article aims to explore the "immutability" concept in
 regards of blockchains. The goal is to provide a practical definition
 of "immutability" that can be followed, and discuss how to design
