@@ -1,0 +1,67 @@
+= Miscellaneous
+Wei Tang <@sorpaas>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[meta="description"]
+This page are miscellaneous of various things that do not belong to a
+certain category.
+
+== Ethereum Istanbul hard fork
+
+Those are some supporting specifications for Istanbul hard fork.
+
+=== Standalone SELFBALANCE
+[spec]
+id: 50-SELFBALANCE
+discuss: https://github.com/corepaper/corepaper/issues/3
+
+This section provides a standalone specification for the `SELFBALANCE`
+opcode.
+
+==== Specification
+
+A new opcode, `SELFBALANCE` is introduced at `0x47`.
+
+* `SELFBALANCE` pops 0 arguments off the stack,
+* `SELFBALANCE` pushes the balance of the current address to the
+  stack,
+* `SELFBALANCE` is priced as GasFastStep, at 5 gas.
+
+=== Aztlan fix
+[spec]
+id: 49-AZTLANFIX
+description: Aztlan Fix Hard Fork
+discuss: https://github.com/corepaper/corepaper/issues/3
+
+This provides a specification as a "fix" to the current Aztlan hard
+fork. That is, it can be applied after Aztlan to fix the current
+problems.
+
+==== Specification
+
+After `HARD_FORK_BLOCK`, apply the following changes:
+
+* Disable EIP-2200, and enable EIP-1283 with EIP-1706.
+* Enable https://specs.corepaper.org/50-selfbalance[50-SELFBALANCE].
+
+=== Aztlan redo
+[spec]
+id: 51-AZTLANREDO
+description: Aztlan Redo Hard Fork
+discuss: https://github.com/corepaper/corepaper/issues/3
+
+This provides a specification that "redo" Aztlan hard fork. This
+assumes that Aztlan will not go through, and a new specification will
+take its place.
+
+==== Specification
+
+After `HARD_FORK_BLOCK`, apply the following changes.
+
+* Enable https://eips.ethereum.org/EIPS/eip-152[EIP-152],
+  https://eips.ethereum.org/EIPS/eip-1108[EIP-1108],
+  https://eips.ethereum.org/EIPS/eip-1344[EIP-1344] and
+  https://eips.ethereum.org/EIPS/eip-2028[EIP-2028].
+* Enable EIP-1283 with EIP-1706.
+* Enable https://specs.corepaper.org/50-selfbalance[50-SELFBALANCE].
