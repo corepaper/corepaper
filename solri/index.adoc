@@ -26,3 +26,10 @@ In particular, the design goal is to:
   output. This reduces the bare minimal storage requirement for full
   node to nearly zero. In practice, clients can selectively choose to
   only store states it cares about.
+
+== Resources ==
+
+* *link:https://github.com/solri/solri[Reference Implementation]*:
+   Draft reference implementation of Solri.
+* *link:https://riot.im/app/#/room/#solri:matrix.org[Matrix
+  Community]*: Chat room hosted on Matrix.
