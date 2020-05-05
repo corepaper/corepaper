@@ -6,6 +6,11 @@ Wei Tang <@sorpaas>
 Istanbul hard fork on Ethereum and Aztlan hard fork on Ethereum
 Classic.
 
+NOTE: This page has been moved to
+https://consensus.corepaper.org[Consensus Paper]. See
+https://consensus.corepaper.org/wiki/Istanbul[Istanbul] and
+https://consensus.corepaper.org/wiki/Aztlan[Aztlan].
+
 Istanbul feature upgrade contains the following specifications:
 
 * https://eips.ethereum.org/EIPS/eip-152[EIP-152]: Add Blake2
