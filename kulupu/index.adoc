@@ -14,8 +14,8 @@ Paper].
 == Overview
 
 Kulupu is a pure (no pre-mine, no gadget) proof-of-work blockchain
-built on the Substrate framework, using the ASIC-resistant mining
-algorithm of RandomX.
+built on the link:https://github.com/paritytech/substrate[Substrate
+framework], using the ASIC-resistant mining algorithm of RandomX.
 
 == Resources
 
