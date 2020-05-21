@@ -16,7 +16,9 @@ discuss: https://github.com/corepaper/corepaper/issues/5
 This section discusses miner-controlled metering, a method to combat
 opcode gas mis-price, by allowing it to be controlled by miners. For
 background, refer to link:https://arxiv.org/abs/1909.07220[this paper]
-and the discussions in <<fork/istanbul.adoc#,Istanbul hard fork>>.
+and the discussions in
+link:https://consensus.corepaper.org/wiki/Istanbul[Istanbul hard
+fork].
 
 === Specification
 
