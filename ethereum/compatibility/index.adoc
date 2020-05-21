@@ -1,5 +1,5 @@
 = Backward compatibility
-Wei Tang <@sorpaas>
+Wei Tang <wei@that.world>
 :license: Apache-2.0
 
 [meta="description"]

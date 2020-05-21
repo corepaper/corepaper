@@ -1,5 +1,5 @@
 = Smart contract
-Wei Tang <@sorpaas>
+Wei Tang <wei@that.world>
 :license: CC-BY-SA-4.0
 
 [meta=description]

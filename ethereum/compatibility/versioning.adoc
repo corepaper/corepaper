@@ -1,5 +1,5 @@
 = Account versioning
-Wei Tang <@sorpaas>
+Wei Tang <wei@that.world>
 :license: CC0-1.0
 
 [meta="description"]
