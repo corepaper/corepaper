@@ -8,11 +8,9 @@ Actor-based contract model aims at solving some of the outstanding
 issues in current call-based contract model in backward compatibility,
 fee payment and other areas.
 
-== Special thanks
-
-Special thanks to all the insightful discussions with Sergei Shulepov,
-and inspiration of prior work
-link:https://github.com/primea/design[Primea].
+NOTE: Special thanks to the insightful discussions with Sergei
+Shulepov, Moonbeam team, and _phyro_ on this topic, and inspiration of
+prior work link:https://github.com/primea/design[Primea].
 
 == Account model
 
@@ -76,3 +74,31 @@ contracts. It has the following information:
 Message processing loop of actor contracts are handled separately in
 transactions. Those transactions can be signed by anyone, providing
 execution gas for the contract.
+
+== Discussions
+
+=== Immutability guarantee
+
+With actor-based contract model, immutability guarantee becomes much
+easier to enforce (and in fact, really hard to break). The only thing
+we need to ensure is a stable interface of message calls. After that,
+it is simply about assigning each actor with its own VM execution
+version.
+
+=== Offchain execution
+
+The actor-based message passing account model allows much better
+security when doing offchain execution.
+
+In an offchain execution environment, we have validators, who handle
+the actual execution of the smart contract code. The validators
+generate signed receipt with changes of storage values and message
+passings. Normal nodes only need to apply those storage values and
+message passings. If anyone believes that a validator provided an
+invalid receipt, they can submit a proof on-chain to slash the
+validator. After that, the state of that smart contract reverts back
+to the point before invalidation.
+
+Note that in the case of contracts sending messages to other
+contracts, all related contract states will have to be reverted all
+together, and with messages reapplied.
