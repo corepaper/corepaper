@@ -59,6 +59,12 @@ define immutability.
   transactions of all past transactions already on the blockchain
   should not change.
 
+To make the definition work, transactions must also come from defined
+authenticated source. This means that for externally owned account,
+the transaction must always have a valid signature. For smart
+contracts, it must be executing the smart contract code body, and
+nothing else.
+
 == Designing blockchains
 
 The obvious benefit of having a definition of immutability is
