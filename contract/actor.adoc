@@ -2,15 +2,12 @@
 Wei Tang <wei@that.world>
 :license: CC-BY-SA-4.0
 :license-code: Apache-2.0
+:created: 2020-03-22
 
 [meta=description]
 Actor-based contract model aims at solving some of the outstanding
 issues in current call-based contract model in backward compatibility,
 fee payment and other areas.
-
-NOTE: Special thanks to the insightful discussions with Sergei
-Shulepov, Moonbeam team, and _phyro_ on this topic, and inspiration of
-prior work link:https://github.com/primea/design[Primea].
 
 == Account model
 
@@ -46,6 +43,17 @@ balance, nonce, or storage values. Calling library contracts use
 specialized functions or opcodes, and any other invocations result in
 fatal error of the execution.
 
+=== Messages of data
+
+Messages are the asynchronous communication method for actor
+contracts. It has the following information:
+
+* *Sender*: The direct sender of the message, either another actor
+   contract or an externally owned account.
+* *Data*: Bytearray sent alongside the message, up to receiver's
+   interpretation.
+* *Balance*: Money sent alongside the message.
+
 === Actor contracts
 
 Actor contracts are those that can be sent messages by externally
@@ -58,22 +66,93 @@ information:
 * *Child storage*: Storage values of the account.
 * *Messages*: Collection of unhandled messages sent to this contract.
 
-== Messages
+=== Actor groups
 
-Messages are the asynchronous communication method for actor
-contracts. It has the following information:
+Because we will be having a large number of actors, they must be cheap
+to create and to execute. Actor groups, forming a group of actors, as
+the basic entity of smart contracts, are to ensure actors are not
+expensive to create and to execute.
 
-* *Sender*: The direct sender of the message, either another actor
-   contract or an externally owned account.
-* *Data*: Bytearray sent alongside the message, up to receiver's
-   interpretation.
-* *Balance*: Money sent alongside the message.
+An account with an address, that is, in the traditional sense of a
+single entity of a smart contract, contains a group of actors. Those
+actors are with independent storage values, but of the same address
+and share the same fee deduction routine. That single group is also
+considered a single process in the scheduler.
+
+Actors in an actor group reference each other by a reference index,
+rather than addresses. Actors in an actor group can be externalized to
+form a new group, in order to separate fee deduction routine and
+addresses.
+
+=== Messages of actors
+
+Actors can also be passed around to different actor groups. The
+receiver contract can decide to keep or drop the actors. Allow message
+passing of actors is critical to enable the fetcher pattern in actor
+design.
 
 == Actor message loop
 
-Message processing loop of actor contracts are handled separately in
-transactions. Those transactions can be signed by anyone, providing
-execution gas for the contract.
+Message processing loop of actor contracts are handled separately
+outside of transactions. A scheduling algorithm calls actors that have
+pending messages to handle at the end of every block, and fill up to
+the block gas limit. This is argubly fairer, because it avoids the
+problem that miners can choose which contracts are executed and which
+are not (however, miners can still choose which messages to put on
+chain).
+
+=== Scheduler design
+
+The goal of the actor message loop scheduler is to accomplish fair
+sharing of the network. If a big smart contract is deployed on the
+network, we want to ensure that a sudden boost of usage of that smart
+contract does not break the whole network.
+
+Scheduler handles gas metering. There is a gas limit enforced globally
+on the scheduler. All message loop processing of actors must
+succeed. An out-of-gas error would revert all states of the loop
+processing. Due to the side-effect-free nature of actor contracts, the
+error would place the actor into "dead under current gas limit"
+category, and the scheduler will not attempt to execute it again
+unless the gas limit has changed.
+
+Under the block gas limit, the job of the scheduler is to allocate
+those gases into message processing loops. The scheduler, similar to
+Linux's CFS scheduler, aims at modelling an "ideal, precise
+multi-tasking CPU". Instead of measuring processes by time passed, we
+measure actors by gas consumed.
+
+== Actor design
+
+One of the limitations for actor-based smart contract model is that it
+will require more on-chain storage. Information about callbacks,
+without call staks, must be stored in the state machine. Actors must
+also be able to handle multiple tasks, when it has to wait for
+something, because messages may not come in sequence.
+
+The principle for building actors is that each actor should only
+handle a single thing. Build one actor for each address that needs to
+have an ERC20 token, rather than only a single actor for the whole
+ERC20 token. Make one actor represent each kitty of CryptoKitties,
+rather than only a single actor for the whole CryptoKitties. This
+design will also ease upgrade of smart contracts, because newer actors
+and older actors can co-exist.
+
+=== Information fetcher
+
+Actors have to fetch information from other actors in many
+situations. For this, we have the information fetcher pattern. The
+information fetcher has two responsibilities. First, it acts as a
+"authenticated" promise that will eventually be passed back to the
+parent actor. Second, it fetches information that the parent actor
+needs.
+
+The information fetcher pattern avoids the need for the parent actor
+to keep storage values of the fetching. Fetcher will be passed to
+other actor groups who will handle the fees, until it is passed back.
+
+Information fetcher is actor model's equivalent of contract call
+stacks.
 
 == Discussions
 
@@ -102,3 +181,16 @@ to the point before invalidation.
 Note that in the case of contracts sending messages to other
 contracts, all related contract states will have to be reverted all
 together, and with messages reapplied.
+
+== Special thanks
+
+Special thanks to the insightful discussions with Sergei Shulepov,
+Moonbeam team, and _phyro_ on this topic, and inspiration of prior
+work link:https://github.com/primea/design[Primea].
+
+== Revision history
+
+- *2020-06-17*: Added additional description about the scheduler
+   design for message loop.
+- *2020-06-22*: Added actor groups and specific actor design on
+   information fetcher.
