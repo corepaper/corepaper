@@ -29,7 +29,7 @@ Instead of one-type-fit-all account model like it is in Ethereum, in
 actor-based account model divides contracts into two different types:
 *actor contracts*, and *library contracts*.
 
-=== Library contracts
+=== Library
 
 Library contracts are code blocks that are specifically only designed
 for calling as libraries. Library contracts can only be invoked by
@@ -43,18 +43,7 @@ balance, nonce, or storage values. Calling library contracts use
 specialized functions or opcodes, and any other invocations result in
 fatal error of the execution.
 
-=== Messages of data
-
-Messages are the asynchronous communication method for actor
-contracts. It has the following information:
-
-* *Sender*: The direct sender of the message, either another actor
-   contract or an externally owned account.
-* *Data*: Bytearray sent alongside the message, up to receiver's
-   interpretation.
-* *Balance*: Money sent alongside the message.
-
-=== Actor contracts
+=== Actor
 
 Actor contracts are those that can be sent messages by externally
 owned accounts or other actor contracts. It has the following
@@ -66,7 +55,7 @@ information:
 * *Child storage*: Storage values of the account.
 * *Messages*: Collection of unhandled messages sent to this contract.
 
-=== Actor groups
+=== Actor group
 
 Because we will be having a large number of actors, they must be cheap
 to create and to execute. Actor groups, forming a group of actors, as
@@ -84,12 +73,85 @@ rather than addresses. Actors in an actor group can be externalized to
 form a new group, in order to separate fee deduction routine and
 addresses.
 
-=== Messages of actors
+When an externally-owned account (EOA) sends messages to an address,
+the "main" actor within the actor group receives the message. EOAs
+cannot send messages to other actors in the actor group.
+
+=== Message
+
+Messages are the asynchronous communication method for actor
+contracts.
 
 Actors can also be passed around to different actor groups. The
 receiver contract can decide to keep or drop the actors. Allow message
 passing of actors is critical to enable the fetcher pattern in actor
 design.
+
+It has the following information:
+
+* *Sender*: The direct sender of the message, either another actor
+   contract or an externally owned account.
+* *Data*: Bytearray sent alongside the message, up to receiver's
+   interpretation.
+* *Balance*: Money sent alongside the message.
+* *Actors*: Actors to be sent alongside the message.
+
+== Externalities
+
+For a specific actor, it has functionality to modify its own storage,
+create child actors, and send messages.
+
+Storage-related externalities include:
+
+* `get_storage(key) -> value`: Get storage value indexed by `key`.
+* `set_storage(key, value)`: Set storage value indexed by `key`, to
+  `value`.
+
+Actor-related externalities include:
+
+* `create_actor(code_hash) -> index`: Create a new actor, marking it
+  as the child of the current actor. Return the index of the actor.
+* `kill_actor(index)`: Kill a direct child actor immediately,
+  referenced by index, dropping all messages of that particular actor.
+* `store_actor(message_index) -> index`: Store the actor passed by
+  message (indexed by `message_index`) as the child actor of the
+  current actor, referenced by new `index`.
+
+Message-related externalities include:
+
+* `get_message() -> message`: Get a descriptor of the current handling
+  message.
+* `send_system_message(name, message)`: Send a message to system actor
+  of `name`.
+* `send_address_message(address, message)`: Send a message to external
+  `address`'s main actor.
+* `send_child_message(index, message)`: Send a message to a child
+  actor with `index`.
+
+== System actors
+
+Below are some descriptions of system actors.
+
+=== Event system actor
+
+Event system actors are actors that turn messages into system
+events. Accepts any message, and emit an event wrapped with that
+message.
+
+=== Address creation system actor
+
+Actors can create new actors themselves, but they rely on system
+actors to externalize those actors to create new contracts. When this
+system actor receives a message with an encoded actor, it generates a
+new contract address, and put the encoded actor as the main actor of
+the new actor group of the contract address.
+
+=== Scheduler actor
+
+This system actor allows scheduling new messages to be sent after
+specific block number has passed. Note that it only guarantees that
+the message will _eventually_ be sent, but not message to be sent at
+specific blocks.
 
 == Actor message loop
 
@@ -192,5 +254,5 @@ work link:https://github.com/primea/design[Primea].
 
 - *2020-06-17*: Added additional description about the scheduler
    design for message loop.
-- *2020-06-22*: Added actor groups and specific actor design on
-   information fetcher.
+- *2020-06-22*: Added actor groups, system actor descriptions, and
+   specific actor design on information fetcher.
