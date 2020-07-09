@@ -43,12 +43,14 @@ balance, nonce, or storage values. Calling library contracts use
 specialized functions or opcodes, and any other invocations result in
 fatal error of the execution.sidenote:library-optional[Library
 contract is optional in actor-based contract model, and it can be
-omitted]
+omitted.]
 
 === Actor
 
 Actor contracts are those that can be sent messages by externally
-owned accounts or other actor contracts. It has the following
+owned accounts or other actor contracts.sidenote:actor-tiny[Actors are
+encouraged to be small and cheap to execute, for separation of
+concerns and decreased likelihood of bugs.] It has the following
 information:
 
 * *Basic*: This includes basic information such as account balance and
@@ -56,6 +58,10 @@ information:
 * *Code hash*: Code of the account.
 * *Child storage*: Storage values of the account.
 * *Messages*: Collection of unhandled messages sent to this contract.
+
+Actors can spawn new actors, which act as the child actor of the
+spawner. Child actors can be killed by parents, which results all
+messages and storages being discarded.
 
 === Actor group
 
@@ -84,10 +90,11 @@ cannot send messages to other actors in the actor group.
 Messages are the asynchronous communication method for actor
 contracts.
 
-Actors can also be passed around to different actor groups. The
-receiver contract can decide to keep or drop the actors. Allow message
-passing of actors is critical to enable the fetcher pattern in actor
-design.
+Actors can also be passed around to different actor groups. The result
+actor will immediately become a child of the receiving actor, and the
+receiving actor can then decide to keep or drop the actors. Allow
+message passing of actors is critical to enable the fetcher pattern in
+actor design.
 
 It has the following information:
 
