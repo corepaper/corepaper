@@ -41,7 +41,9 @@ externally owned accounts. It has the following information:
 Note the explict omission of other information such as account
 balance, nonce, or storage values. Calling library contracts use
 specialized functions or opcodes, and any other invocations result in
-fatal error of the execution.
+fatal error of the execution.sidenote:library-optional[Library
+contract is optional in actor-based contract model, and it can be
+omitted]
 
 === Actor
 
