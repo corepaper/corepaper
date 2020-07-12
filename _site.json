@@ -1,5 +1,6 @@
 {
   "title": "Core Paper",
   "url": "https://corepaper.org",
+  "baseUrl": "/",
   "github": "https://github.com/corepaper/corepaper"
 }
