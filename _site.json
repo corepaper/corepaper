@@ -2,5 +2,15 @@
   "title": "Core Paper",
   "url": "https://corepaper.org",
   "baseUrl": "/",
-  "github": "https://github.com/corepaper/corepaper"
+  "github": "https://github.com/corepaper/corepaper",
+  "links": [
+    {
+      "name": "Github",
+      "url": "https://github.com/corepaper/corepaper"
+    },
+    {
+      "name": "Discussion",
+      "url": "https://github.com/corepaper/corepaper/issues"
+    }
+  ]
 }
