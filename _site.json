@@ -3,6 +3,9 @@
   "url": "https://corepaper.org",
   "baseUrl": "/",
   "github": "https://github.com/corepaper/corepaper",
+  "sitemap": {
+    "enable": true
+  },
   "links": [
     {
       "name": "Github",
