@@ -76,10 +76,10 @@ snapshotting lifecycle, and may not need to participate in the root
 process snapshotting in regards of the current block.
 
 For example, a process `A` may invoke a child process `B` but return
-early in current block, and only inspect the status of `B` status till
-the next block. It makes no difference if `B` is actually executed in
-the current block or the next block, and based on the runtime
-executor's business, it can determine that itself.
+early in current block, and only inspect the status of `B` till the
+next block. It makes no difference if `B` is actually executed in the
+current block or the next block, and based on the runtime executor's
+business, it can determine that itself.
 
 Most runtimes require generation of state root -- a value pinning the
 current runtime execution state. The root process should be
