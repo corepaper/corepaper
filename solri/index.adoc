@@ -33,3 +33,5 @@ In particular, the design goal is to:
    Draft reference implementation of Solri.
 * *link:https://riot.im/app/#/room/#solri:matrix.org[Matrix
   Community]*: Chat room hosted on Matrix.
+* *link:https://discord.gg/DZbg4rZ[Discord Community]*: Chat room
+  hosted on Discord.

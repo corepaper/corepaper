@@ -1,0 +1,117 @@
+= Deterministic parallel execution
+Wei Tang <wei@that.world>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+One of the bottlenecks in blockchain execution is that runtime and
+transactions can only be executed sequencially. In this article, we
+explore some setups of deterministic parallel execution.
+
+[meta=description]
+The goal of deterministic parallel execution is to allow block runtime
+to execute some of its subparts at the same time, while maintain the
+deterministic nature of block execution.
+
+== Overview ==
+
+We follow the deterministic parallel execution model as outlined in
+link:https://static.usenix.org/events/osdi10/tech/full_papers/Aviram.pdf[this
+paper]sidenote:dpaper[Aviram, Amittai, et al. "Efficient
+system-enforced deterministic parallelism." Communications of the ACM
+55.5 (2012): 111-119.], and adopt it in a blockchain environment.
+
+The system environment consists of a root process, and various child
+processes. A parent process can dispatch execution to multiple child
+processes at the same time, and those child processes can execute
+things in parallel. Child processes can only communicate with the
+parent process at specific return points, thus enforcing determinism.
+
+The whole runtime is long-standing across block boundary. A special
+system call is available for the root process to "snapshot" the
+current runtime and commit to create a new block.
+
+== Process ==
+
+Processes are the unit of execution. Processes can have child
+processess, and processes can control their direct childs. Processes
+can only intercept child processes at specific return points. This is
+what allows deterministic parallelism.
+
+Three specific system calls are available for processes to manipulate
+child processes and control parallelism:
+
+* `PUT`: Copy specific values into child.
+* `GET`: Get specific values from child since last child process
+  snapshot.
+* `RET`: Stop and wait for parent to issue a `PUT` or `GET`.
+
+Note that if a child process is executing, then a `PUT` or `GET` will
+block the parent process' execution until the child process execution
+returns.
+
+As a general rule of thumb, parent process should only execute child
+processes that it trusts, as a child process can block the parent
+process indefinitely. If the parent process wants to invoke
+user-defined code, it should annotate the code with specific metering
+data to ensure that the child process always returns.
+
+== Root process I/O ==
+
+The root process is the only process that is allowed to access I/O. In
+our case, this means block and extrinsic information.
+
+One special system call is available for the root process --
+`SNAPSHOT`. As its name stands, it will snapshot the state and return
+a value representing the current block data. It will also designate a
+specific memory region. When the root process is resumed again, the
+runtime caller will put the next block's metadata into this memory
+region.
+
+== In-advance processing ==
+
+The full deterministic parallel runtime model can be understood as a
+dependency snapshotting graph (via the `PUT`, `GET` and `RET` system
+calls). One thing to note about this is that each process has its own
+snapshotting lifecycle, and may not need to participate in the root
+process snapshotting in regards of the current block.
+
+For example, a process `A` may invoke a child process `B` but return early
+in current block, and only inspect `B`'s status till the next
+block. It makes no difference if `B` is actually executed in the
+current block or the next block, and based on the runtime executor's
+business, it can determine that itself.
+
+Most runtimes require generation of state root -- a value pinning the
+current runtime execution state. The root process should be
+responsible for this. It inspects all child processes' states and
+calculate needed hashes for them. The act of inspection will ensure
+that all those processes that root process cares about as for the
+current block finished execution before the current block is
+finalized.
+
+== Rationale ==
+
+=== Persistant storage ===
+
+Readers may notice that the design does not have delibrate storage
+semantics (like Substrate's `get_storage` and `set_storage`). Instead,
+the memory is the persistent storage structure.
+
+The runtime execution environment must handle process snapshotting
+correctly, and allow revertion when needed. Block reorg may happen. In
+addition, a child process may fail its execution, and in that case,
+its state must be reverted back to the last snapshot point. The reason
+for this is that this allows the parent process to retry the child
+process execution later if it is a recoverable issue (for example, an
+out-of-gas error).
+
+Not having separate concept of persistant storage but solely using
+memory heap encourages the users to design small and single-purpose
+processes. It also simplifies the implementation of snapshotting and
+avoid the complication of another storage system snapshotting.
+
+=== Snapshotting instead of bootstrapping ===
+
+The whole runtime is long-running across block processings. Runtime
+state does not bootstrap again across block boundary. This removes the
+cost of bootstrapping the runtime.
