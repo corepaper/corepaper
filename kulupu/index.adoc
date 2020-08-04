@@ -39,11 +39,14 @@ In addition, Kulupu contains several unique features:
    allows Kulupu to build a public-good treasury system, with coin
    holders having the final say on how funds are spent. The treasury
    taxation is fair, and at the same time voluntary, reducing the risk
-   of centralization and misuse.
+   of centralization and misuse.sidenote:wip-treasury[The
+   donation-based treasury system can be used right now in production,
+   but the voluntary taxation system is still work-in-progress.]
 * *Actor-based smart contract.* Actor-based smart contract aims at
    solving some of the outstanding issues in normal call-based smart
    contract system, improving backward compatibility, fee payment and
-   other areas.
+   other areas.sidenote:wip-actor[Actor-based smart contract system is
+   still work-in-progress.]
 * *Interoperability with Polkadot.* By using Substrate, building on
    the same framework that Polkadot is built on, Kulupu allows easy
    interoperaibility with Polkadot in the future.
