@@ -10,7 +10,7 @@ online upgrade.
 == Overview
 
 Kulupu is a self-updating self-governed blockchain system, using
-proof-of-work as its consensus engine.Kulupu is built with the
+proof-of-work as its consensus engine. Kulupu is built with the
 link:https://github.com/paritytech/substrate[Substrate framework]. It
 is one of the first blockchains that combine proof-of-work consensus
 engine with forkless upgrades.
