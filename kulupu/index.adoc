@@ -53,12 +53,12 @@ In addition, Kulupu contains several unique features:
 More information regarding Kulupu can be found at
 link:https://consensus.corepaper.org/[Consensus Paper].
 
-* link:https://consensus.corepaper.org/wiki/Kulupu[Kulupu description].
-* link:https://consensus.corepaper.org/wiki/Roadmap_of_Kulupu[Roadmap
-  of Kulupu].
-* link:https://consensus.corepaper.org/wiki/Governance_of_Kulupu[Governance
-  of Kulupu].
-* link:https://consensus.corepaper.org/wiki/Councillors_of_Kulupu[https://consensus.corepaper.org/wiki/Councillors_of_Kulupu].
+* *link:https://consensus.corepaper.org/wiki/Kulupu[Kulupu description]*
+* *link:https://consensus.corepaper.org/wiki/Roadmap_of_Kulupu[Roadmap
+  of Kulupu]*
+* *link:https://consensus.corepaper.org/wiki/Governance_of_Kulupu[Governance
+  of Kulupu]*
+* *link:https://consensus.corepaper.org/wiki/Councillors_of_Kulupu[Councillors_of_Kulupu]*
 
 == Resources
 
