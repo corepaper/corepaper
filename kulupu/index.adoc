@@ -15,7 +15,7 @@ link:https://github.com/paritytech/substrate[Substrate framework]. It
 is one of the first blockchains that combine proof-of-work consensus
 engine with forkless upgrades.
 
-It has all the normal features you'd expect in a proof of work
+Kulupu has all the normal features you'd expect in a proof of work
 blockchain.
 
 * *No pre-mine.* Kulupu was launched in September 2019, with 0 coin in
