@@ -1,0 +1,39 @@
+= Adjusted total supply
+Wei Tang <wei@that.world>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[meta="description"]
+Adjusted total supply is a concept of total supply with consideration
+of fee market.
+
+Kulupu implements fee market, which is a method to have more
+predictable transaction fees. With this method, the _base_ transaction
+fees are burned instead of paid to miners. Miners only retain the
+_tips_. Burning the base fee is important as it avoids giving miners
+incentives to create artifical transactions to manipulate the fee.
+
+Kulupu may also implement a treasury and voluntary taxation
+system. With this implementation, the treasury funding gets burned
+every spending cycle.
+
+In a proof of work blockchain, a popular theme is total supply, in
+which block rewards initially dominate, and then gradually switch to a
+fee only system. However, with burning methods like fee market and
+treasury spending, a direct translation of total supply will result in
+deflation.
+
+== Definition
+
+Instead of a definite total supply, here we propose a concept called
+**adjusted total supply**. Adjusted total supply is the actual
+eventual total supply of a blockchain, with considerations of fee
+market and other coin burning methods.
+
+== Reaching fixed adjusted total supply
+
+To reach fixed adjusted total supply, we assume normal usage of Kulupu
+blockchain. That is, each block is on average half full of its block
+weight limit. A block half full would burn 8 KLP. As a result, any
+emission scheme with eventual tail emission of equal or less than 8
+KLP can be considered to have fixed adjusted total supply.
