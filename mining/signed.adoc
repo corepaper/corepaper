@@ -76,6 +76,48 @@ that mining hardwares must keep the private key together with the
 miner. Transmitting large amount of signatures through the network is
 impractical and inefficient.
 
+== Kulupu
+[spec]
+id: 53-KSIGNED
+description: Signed Mining for Kulupu
+discuss: https://github.com/corepaper/corepaper/issues/4
+
+=== Specification
+
+Previously, an optional pre-runtime digest can be included in PoW
+consensus engine, under `POW_ENGINE_ID`. After signed minig, the
+pre-runtime digest becomes required, and it encodes a sr25519 public
+key, representing the coinbase author.
+
+The header seal is changed to included an additional `signature`
+field.
+
+[source,rust]
+sturct Seal {
+  difficulty: Difficulty,
+  nonce: H256,
+  signature: sr25519::Signature,
+}
+
+The RandomX work is computed as follows. First, we prepare the
+`Calculation`, using the block header `pre_hash`, targeted difficulty,
+and the chosen nonce.
+
+[source,rust]
+struct Calculation {
+  pre_hash: H256,
+  difficulty: Difficulty,
+  nonce: H256,
+}
+
+The `Calculation` is then encoded by SCALE, hashed by 256-bit
+`blake2b` to produce a hash. The hash is then signed by the coinbase
+author sr25519 private key to produce a signature.
+
+Then we encode `(Calculation, sr25519::signature)` using SCALE, and
+feed it as the input to the RandomX hashing function to produce the
+final mining work.
+
 == Ethereum
 [spec]
 id: 52-ESIGNED
@@ -101,29 +143,3 @@ following:
   header.
 * Check that stem:[H_2] is the valid preimage for Ethash of `mixHash`
   and `nonce`.
-
-== Kulupu
-[spec]
-id: 53-KSIGNED
-description: Signed Mining for Kulupu
-discuss: https://github.com/corepaper/corepaper/issues/4
-
-=== Specification
-
-Change the header seal to be of the following SCALE encoded structure:
-
-[source,rust]
-struct Seal {
-  difficulty: Difficulty,
-  nonce: H256,
-  signature: Signature,
-  work: H256,
-}
-
-Change the verification process to be as follows:
-
-* Check that `difficulty` is the valid difficulty.
-* Check that `(difficulty, nonce)` is the valid preimage of sr25519
-  `signature`, against public key provided in the pre-runtime digest.
-* Check that `(difficulty, nonce, signature)` is the valid preimage of
-  RandomX `work`.
