@@ -93,7 +93,7 @@ The header seal is changed to included an additional `signature`
 field.
 
 [source,rust]
-sturct Seal {
+struct Seal {
   difficulty: Difficulty,
   nonce: H256,
   signature: sr25519::Signature,
