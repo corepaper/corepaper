@@ -1,6 +1,7 @@
 = Smart contract
 Wei Tang <wei@that.world>
 :license: CC-BY-SA-4.0
+:order: 1
 
 [meta=description]
 Discussions and notes about smart contracts.

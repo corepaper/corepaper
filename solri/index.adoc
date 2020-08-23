@@ -2,6 +2,7 @@
 Wei Tang <wei@that.world>
 :license: CC-BY-SA-4.0
 :license-code: Apache-2.0
+:order: 4
 
 [meta=description]
 Solri is a blockchain experiment that tries to bring Substrate style

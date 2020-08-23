@@ -2,6 +2,7 @@
 Wei Tang <wei@that.world>
 :license: CC-BY-SA-4.0
 :license-code: Apache-2.0
+:order: 5
 
 [meta="description"]
 Kulupu is a proof of work blockchain with on-chain governance and
@@ -35,6 +36,13 @@ In addition, Kulupu contains several unique features:
    split, compared with hard-fork-based governance systems. The same
    system also allows upgrading the consensus, including mining
    algorithm and difficulty adjustment algorithm.
+* *Signed mining and block reward lock.* A miner provides security at
+   a specific point-in-time for the blockchain. In the mean time, that
+   specific point-in-time security is expected to have a lasting
+   effect for the blockchain for a certain period of time. Block
+   reward lock and signed mining allows Kulupu to account for that
+   security aspect. It also prevents hash-power rental attacks and
+   botnets.
 * *Voluntary taxation and treasury.* A democracy governance system
    allows Kulupu to build a public-good treasury system, with coin
    holders having the final say on how funds are spent. The treasury

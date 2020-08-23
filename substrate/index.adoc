@@ -1,6 +1,7 @@
 = Substrate
 Wei Tang <wei@that.world>
 :license: CC-BY-SA-4.0
+:order: 2
 
 [meta=description]
 Core Paper of Substrate aims at providing some notes and
