@@ -69,7 +69,8 @@ link:https://consensus.corepaper.org/[Consensus Paper].
   of Kulupu]*
 * *link:https://consensus.corepaper.org/wiki/Governance_of_Kulupu[Governance
   of Kulupu]*
-* *link:https://consensus.corepaper.org/wiki/Councillors_of_Kulupu[Councillors_of_Kulupu]*
+* *link:https://consensus.corepaper.org/wiki/Councillors_of_Kulupu[Councillors
+   of Kulupu]*
 
 == Resources
 
