@@ -9,19 +9,19 @@ of various blockchain projects.
 Core Paper consists of several sub-projects:
 
 * *Core Paper of Ethereum*: Ethereum-specific specifications and
-   reviews.
+  reviews.
 * *Core Paper of Substrate*: Substrate-specific descriptions,
   including link:https://kulupu.network[Kulupu].
 * *Core Paper of Solri*: link:https://solri.org[Solri] family
-   blockchains.
+  blockchains.
 
 == Community
 
 * *Matrix*:
-   link:++https://riot.im/app/#/room/#corepaper:matrix.org++[General],
-   link:++https://riot.im/app/#/room/#kulupu:matrix.org++[Kulupu],
-   link:++https://riot.im/app/#/room/#solri:matrix.org++[Solri],
-   link:++https://riot.im/app/#/room/#eips:matrix.org++[Ethereum]
+  link:++https://riot.im/app/#/room/#corepaper:matrix.org++[General],
+  link:++https://riot.im/app/#/room/#kulupu:matrix.org++[Kulupu],
+  link:++https://riot.im/app/#/room/#solri:matrix.org++[Solri],
+  link:++https://riot.im/app/#/room/#eips:matrix.org++[Ethereum]
 * *Discord*: link:https://discordapp.com/invite/b6vZDZs[Invite Link]
 
 == Contributing
