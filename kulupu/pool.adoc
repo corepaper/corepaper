@@ -1,0 +1,70 @@
+= Decentralized mining pool
+Wei Tang <wei@that.world>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[meta="description"]
+This article explores a specification for a decentralized mining pool
+implemented in Kulupu's protocol level, assuming signed mining.
+
+Those changes are built on top of
+link:https://specs.corepaper.org/53-KSIGNED[53-KSIGNED].
+
+== Proof of work seals
+
+Proof of work operates on *seals*, and each of them have a
+corresponding difficulty. Two seals of difficulty `A` should have the
+same effect as one seal of difficutly `2 * A`, because the former is
+equivalent to having the block time cut in half as the later.
+
+On protocol level, we change signed mining to allow multiple seals to
+be included in a block header, with each of them having a difficulty
+of `D / N`, where `D` is the current difficulty, and `N` is the number
+of seals.
+
+[source,rust]
+type MultiSeal = Vec<Seal>;
+
+The seals in the array are built on top of each other. The first
+`Calculation` uses the `pre_hash` of the header. The second one use
+the `pre_hash` of the completed first `Seal`, and so forth.
+
+Note that each seal in this sequence will have the same
+difficulty. Otherwise, a centralized mining pool can game the system
+by providing itself a seal with a low difficulty, and asking real
+miners to provide a seal with a high difficulty.
+
+== Reward calculations
+
+At this moment, block rewards are calculated and deposited in the same
+block. This works with single seal system because the sealer is always
+known in advance. However, with the new system that multiple miners
+will be building on the same block, we need to move the reward
+calculation to _the beginning of next block_.
+
+The runtime, upon initialization, will read the seal data of the
+previous block and compute its reward. It then handles the reward
+deposit logic from there.
+
+== Pool sub-networks
+
+Built with the protocol changes, multiple decentralized mining pools
+can be implemented for Kulupu.
+
+Those pools operate on another network layer. Each pool differs in its
+respective difficulty level, by setting up a fixed number of how many
+seals it expects to be built in one block.
+
+* Upon receiving a new Kulupu block in the network. Peers in a pool
+  drop any existing work, and set the `pre_hash` to be a new block
+  that itself is building. Note that at this moment, peers in a single
+  pool will build on different `pre_hash`, because they each generates
+  new blocks individually.
+* The first peer that finds a seal with difficulty `D / N` publishes
+  the header with the seal to the sub-network of the decentralized
+  pool.
+* Other peers, upon receiving the header, will first verify the
+  runtime logic of the received header, and verify the consensus of
+  the received seal. It then starts to build upon the seal.
+* Once there are `N` seals accumulated in the header, the sub-network
+  publishes the block to the Kulupu network.
