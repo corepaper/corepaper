@@ -1,0 +1,48 @@
+= Mining as lottery process
+Wei Tang <wei@that.world>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[meta="description"]
+Mining should be considered lottery process, but not professional
+for-profit process. The former are hobbyists who mine using their home
+machines in their spare time with their spare resources. The later are
+professionals who explicitly buy hardware just for mining and mine as
+mining farms.sidenote:philosophy-stub[This is a philosophical stub
+regarding a certain aspect of Kulupu. It does not necessarily reflect
+the majority thinking of the community or even the reality.]
+
+The problem with mining as for-profit process is that it is too
+expensive. So it discourages others from joining. Lottery process, on
+the other hand, assumes that participants do this as an activity in
+one's spare time. It expects close-to-zero cost of joining, a really
+small percentage of expected profit, and in the mean time, large
+rewards if the lottery is won. Those who join as professional
+for-profit process won't be able to compete with those who join as
+lottery process, because the later can afford a much lower expected
+reward.
+
+To make mining as lottery process a reality, there are three necessary
+pre-conditions:
+
+* The mining process can only mine to a user's own wallet, but not any
+  third party one.
+* The mining algorithm must run most efficiently on commodity
+  hardware. It must be ASIC-resistance.
+* The user experience must be easy. A miner should be easy to run. It
+  should take advantage of the spare CPU resources but should not
+  affect normal usage.
+
+Mining as lottery process can also be encouraged by long-term
+commitment rather than short-term profits.
+
+A successful deployment of mining as lottery process will have
+everyone who is interested in a blockchain mining the blockchain using
+their own computers of the spare resources. The network hash-power, as
+considered in today's term, will be over-populated, leaving only a
+small margin of expected profits. Professional miners will find the
+profit not attractive, and thus hesitant to join, because dedicated
+mining rigs will require dedicated maintenance costs and power
+consumption. Each of the hobbyist miner's hash power may be small, but
+collectively, those spare resource mining power should be larger than
+any of the professional mining farms.
