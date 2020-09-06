@@ -5,12 +5,14 @@ Wei Tang <wei@that.world>
 
 [meta="description"]
 Mining should be considered lottery process, but not professional
-for-profit process. The former are hobbyists who mine using their home
-machines in their spare time with their spare resources. The later are
-professionals who explicitly buy hardware just for mining and mine as
-mining farms.sidenote:philosophy-stub[This is a philosophical stub
-regarding a certain aspect of Kulupu. It does not necessarily reflect
-the majority thinking of the community or even the reality.]
+for-profit process.
+
+The former are hobbyists who mine using their home machines in their
+spare time with their spare resources. The later are professionals who
+explicitly buy hardware just for mining and mine as mining
+farms.sidenote:philosophy-stub[This is a philosophical stub regarding
+a certain aspect of Kulupu. It does not necessarily reflect the
+majority thinking of the community or even the reality.]
 
 The problem with mining as for-profit process is that it is too
 expensive. So it discourages others from joining. Lottery process, on
