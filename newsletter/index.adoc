@@ -1,0 +1,6 @@
+= Newsletters
+Wei Tang <wei@that.world>
+:license: Apache-2.0
+
+[meta=description]
+This section contains newsletters related to Core Paper projects.

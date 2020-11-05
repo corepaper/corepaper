@@ -1,0 +1,59 @@
+= Newsletter #1
+Wei Tang <wei@that.world>
+:license: Apache-2.0
+
+[meta=description]
+This is the first-ever Core Paper Newsletter. This newsletter aims at
+giving readers regular updates on Core Paper projects, including
+Kulupu, Solri and others.
+
+The newsletter will be updated from time to time, without a fixed
+interval.
+
+== Kulupu
+
+The current development focus on Kulupu is still **mining
+optimization** and **emission framework polishment**.
+
+* Thanks to Shawn Tabrizi, the reward curve function is
+  link:https://github.com/kulupu/kulupu/pull/97[merged] in
+  Kulupu. This provides the basis for defining long-term emission
+  curves on-chain via the democracy governance module.
+* Work is link:https://github.com/kulupu/kulupu/pull/99[under way] to
+  update Kulupu to Substrate master and improving build
+  experience. The goal is to remove all git submodules, which was a
+  pain point for users building Kulupu from source code. This is
+  currently pending a discussion
+  link:https://github.com/paritytech/substrate/pull/7489[related to
+  keystore].
+* Discussions are on-going in our
+  link:https://discord.kulupu.network[Discord server] to reduce the
+  number of council seats.
+* During **Gondoa** runtime upgrade, an accidential runtime module
+  index change resulted in all current pending democracy proposals to
+  be cancelled. The council has tentatively agreed to reimburse all
+  slashed proposal fees, as this is a technical error. You can read
+  more on Kulupu's
+  link:https://kulupu.network/incident/#module-index-change-in-runtime-upgrade[incident
+  report].
+
+== Miscellaneous
+
+* A thought experiment called
+  link:https://github.com/dothereum/dothereum[Dothereum] is
+  started. This is describing what the eth1 to eth2 transition looks
+  like if it happens in Substrate / Polkadot. The main advantage is
+  that not everything needs to be in place in one go (at the
+  transition height). Noticeable improvements can be tested in
+  production, and experienced by users along the way. A rough
+  specification was provided for what the user experience would look
+  like.
+
+== Non-Paper notable mentions
+
+* Besides two high reliability validators, Wei's Polkadot validation
+  service now also offers a third home-run validator option ("Wei/3")
+  for those who want to support eco-friendliness and
+  decentralization. You can read more about this Polkadot validator
+  service on link:https://that.world/~wei/polkadot/validate/[Wei's
+  website].
