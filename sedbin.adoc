@@ -29,7 +29,7 @@ proof of work, and shares security.
 
 Master blockchain's header contains a trie root, in which a trie
 structure allows list of arbitrary data to be recorded. Those data are
-expected to be the pre-hash of participating blockchain's header. Once
+expected to be the pre-hash of participating blockchain's block. Once
 a pre-hash is recorded in master blockchain's header, participating
 blockchains can use that header to generate a valid seal, and produce
 a new block.
@@ -52,7 +52,6 @@ structure for master blockchain, encoded in SCALE.
 [source,rust]
 struct Header {
   parent_hash: Hash,
-  data_size: u32,
   data_root: Hash,
   seal: Seal,
 }
@@ -61,9 +60,15 @@ struct Header {
 proof of work. For example, a common seal structure would be `(nonce,
 difficulty, work)`.
 
-`data_size` and `data_root` collectively forms a binary merkle tree
-where it has a list of data (of length `data_size`) where all of the
-data are of type `Hash`.
+`data_root` is a binary merkle tree. The top-level merkle tree is
+expected to a list. The first item is the actual list root, and the
+second item encodes the list size. It then records the pre-hashes
+together with all the actual data.
+
+For sedbin to work, it's important to ensure data availability. To do
+this, we encode all intermediate nodes in the binary merkle tree with
+prefix `0x01`, and all leaf nodes in the binary merkle tree with
+prefix `0x00`.
 
 The master blockchain also defines its own difficulty adjustment rules
 and fork choice rules.
