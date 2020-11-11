@@ -1,0 +1,64 @@
+= Newsletter #2
+Wei Tang <wei@that.world>
+:license: Apache-2.0
+
+[meta=description]
+This is the second Core Paper Newsletter. This newsletter aims at
+giving readers regular updates on Core Paper projects, including
+Kulupu, Solri and others.
+
+The newsletter will be updated from time to time, without a fixed
+interval.
+
+== Announcing "Kulupu, The Code"
+
+To faciliate the difference between development and marketing, we're
+going to launch a canary network (testnet), called *Kulupu, The Code*
+(short for *The Code* in the below paragraphs). To avoid confusions,
+the current mainnet is going to be called *Kulupu, The Coin* (short
+for *The Coin* in the below paragraphs). New features and ideas will
+first be developed and tested on *The Code*. The canary network
+(testnet) is what the developers will be directly maintaining.
+
+Once in a while, community members can fetch new features from *The
+Code*, and apply them to *The Coin*. *The Coin* is considered a value
+network, which means that it's a network that investors may speculate
+and trade.
+
+image::process.png[]
+
+We do not plan to launch the canary network (testnet) *The Code*
+just yet. It will likely happen in the coming months. Several notable
+difference of *The Code* compared with *The Coin* are likely to happen
+initially with further development of Kulupu.
+
+* *The Code* will likely to be directly on PoW algorithm
+  version 3. This is likely to be a GPU-friendly algorithm with
+  imporved signed mining, using deterministic signatures. This will
+  allow *The Code* to have shorter block time.
+* *The Code* will likely to have better era support from the
+  beginning, to better facilitate any possible ReGenesis process.
+* *The Code* will likely to have a new difficulty adjustment logic, to
+  better facilitate light clients. It will likely also use
+  digest-based PoW-upgrading logic, rather than the current one based
+  on runtime-extern.
+* The canary network (testnet) community of *The Code* will be more
+  likely to support unlimited total supply (and fixed emission) than
+  *The Coin*.
+
+*The Coin* is supposed to form a leaderless community from
+now on. Network upgrades of *The Code* will continue to be maintained
+by the development community. However, on *The Coin*, this is expected
+to be a task that is *up for grab by the public*.
+
+The development community will continue to facilitate tasks for *The
+Coin* for things related to fact-checking and transparency. This
+includes disclaimers, DYOR series posts, misinformation corrections,
+and others.
+
+== Miscellaneous
+
+* The specification of Sedbin is updated to now require data
+  availability. Without the data availability guarantee, Sedbin's fork
+  choice will not function correctly.sidenote:thank-you[Thank you,
+  Alistair Stewart!]
