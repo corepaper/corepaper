@@ -1,0 +1,38 @@
+= Newsletter #3
+Wei Tang <wei@that.world>
+:license: Apache-2.0
+
+[meta=description]
+This is the third Core Paper Newsletter. This newsletter aims at
+giving readers regular updates on Core Paper projects, including
+Kulupu, Solri and others.
+
+The newsletter will be updated from time to time, without a fixed
+interval.
+
+== Kulupu
+
+On the Kulupu network, there is currently one democracy referendum
+ongoing, together with several development and communication updates.
+
+* A new referendum is under voting. The voting period ends on block
+  282,240. If it passes, Kulupu's block reward will be set to 10 KLP.
+* A new Kulupu
+  link:https://wiki.kulupu.network/Network_upgrade_communication_protocol[network
+  upgrade communication protocol] document is published on the Kulupu
+  wiki. This is to specify the process of network upgrade and
+  responsibilities of various parties, to ensure trustworthiness and
+  security.
+* Direct coin-holder initiated funding process for treasury is
+  implemented in code runtime. (#100)
+* Desired council members count is changed from 17 to 11 in code
+  runtime. (#101)
+* Build and CI experience improvements. Substrate git submodule is
+  replaced by direct git dependency. Locked flag is added for CI runs
+  to reduce the possibility of mistakes. (#99, #102)
+
+== Miscellaneous
+
+* Ellaism community has expressed interests in the
+  link:https://github.com/dothereum/dothereum[Dothereum] thought
+  experiment.
