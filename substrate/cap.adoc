@@ -30,6 +30,9 @@ system:
   the real needs, as in a law system, certain aspects (like the
   constitution) should be much harder to change than others. We cannot
   yet express this in the current model.
+* Currently, even if we only need to modify a single runtime module,
+  we still need to replace the whole runtime binary. This is not an
+  ideal situation.
 * It is not always clear for users regarding the influences of its
   funding when sending out transactions. The documentations usually
   point it out clearly, but still, there is nothing on-chain that can
