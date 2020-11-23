@@ -1,14 +1,14 @@
-= Capatibility-based runtime modules
+= Capability-based runtime modules
 Wei Tang <wei@that.world>
 :license: CC-BY-SA-4.0
 
 [meta=description]
-Capatibility-based runtime modules for Substrate is an
+Capability-based runtime modules for Substrate is an
 alternative design of Substrate Runtime Module Libraries. It aims at
-incoperating some capatibility-based system into runtime, to address
+incoperating some capability-based system into runtime, to address
 some concerns on upgradability and security.
 
-The core idea of capatibility-based runtime modules is that instead of
+The core idea of capability-based runtime modules is that instead of
 modules compiled in one single binary and communicating directly
 through internal calls, we design a root OS-like runtime. Each
 function modules are compiled individually as its own binary and only
@@ -39,7 +39,7 @@ system:
   allow users to state clearly if it is willing to give the ability to
   runtime modules to slash or transfer the balances.
 
-Capatibility-based runtime modules address those issues by:
+Capability-based runtime modules address those issues by:
 
 * Creating a root runtime. The root runtime acts as the "OS kernel" of
   the whole runtime. All function runtime modules are sandboxed and
@@ -66,42 +66,42 @@ sandboxed WebAssembly environment. The sandboxed environment does not
 have the full storage access of the blockchain. Instead, it is only
 limited to a standalone child storage.
 
-=== Capatibility and invocation
+=== Capability and invocation
 
-A *capatibility* has three items, the *owner*, the *process module*
-who created this capatibility, and the *capatibility data*. An
-*invocation* of a capatibility will execute a function call and
-consumes it. The invocation, besides passing the capatibility, also
+A *capability* has three items, the *owner*, the *process module*
+who created this capability, and the *capability data*. An
+*invocation* of a capability will execute a function call and
+consumes it. The invocation, besides passing the capability, also
 passes a *function name* and some *parameters*. This is to allow the
-sender to indicate how it wants to spend the capatibility. If a
-capatibility is repeatable, then the invocation may return new
+sender to indicate how it wants to spend the capability. If a
+capability is repeatable, then the invocation may return new
 capatibilities. For example, a `balance::slashable(address, 100)`
-capatibility can be invoked with `slash(90)`, and if successful, it
+capability can be invoked with `slash(90)`, and if successful, it
 will return a new capatibilty `balance::slashable(address, 10)`.
 
-Note that a capatibility may become dangling, if an incompatible
+Note that a capability may become dangling, if an incompatible
 process module upgrade is enacted. The root runtime will make sure
 that capatibilies cannot be modified, but it's the process module's
-job to check whether a capatibility is valid.
+job to check whether a capability is valid.
 
 In an invocation, parameters to a function call can also be
 capatibilities. The capatibilities will be passed by root runtime from
 the sender to the receiver. The receiver can then store this
-capatibility for future use, to do invocations that it would otherwise
+capability for future use, to do invocations that it would otherwise
 not be able to do.
 
 Capatibilities can also be created by user transactions. Those are
 created through a special method call in process modules and can only
 be invoked by root runtime. A user transaction can contain a
-`requests` field that has a capatibility `balance::slashable(address,
-100)`. The root runtime will pass this capatibility to be checked by
+`requests` field that has a capability `balance::slashable(address,
+100)`. The root runtime will pass this capability to be checked by
 `balance` module, indicating that it is signed by the user. It creates
-this capatibility if the request is valid. Otherwise, the whole user
+this capability if the request is valid. Otherwise, the whole user
 transaction will fail directly.
 
-A capatibility cannot be copied by itself. Any duplicable capatibility
+A capability cannot be copied by itself. Any duplicable capability
 will have a function call `duplicate` that can split the current
-capatibility to two.
+capability to two.
 
 === Process module lifecycle
 
@@ -122,7 +122,7 @@ capatibilities and pass them to a democracy module.
 * For an upgradable process module, upon initialization, it receives
   the two system capatibilities `system::upgradable(module)` and
   `system::destory(module)`. The initialization parameter also
-  requires a capatibility with interface `push(<any capatibility>,
+  requires a capability with interface `push(<any capability>,
   <rule>)` and `clear()`, which is supposed to point to a democracy
   module, for example, `democracy::votable(id)`. The module then
   pushes `system::upgradable(module)` along with other votable
@@ -130,11 +130,11 @@ capatibilities and pass them to a democracy module.
   users with lists of capatibilities that it receives, and users can
   vote to invoke those capatibilities under their specified rules.
 * For staking module, users, in their transactions, first specify a
-  capatibility request `balance::slashable(X)`. The extrinsic is then
+  capability request `balance::slashable(X)`. The extrinsic is then
   set to `staking::bound(balance::slashable(X))`.
 
 == Implementation
 
-A viable way to implement capatibility-based runtime modules is to
+A viable way to implement capability-based runtime modules is to
 implement it as a SRML module. The root runtime becomes a normal
 modules that controls many sandboxed submodules.
