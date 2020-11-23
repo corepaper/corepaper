@@ -1,0 +1,137 @@
+= Capatibility-based runtime modules
+Wei Tang <wei@that.world>
+:license: CC-BY-SA-4.0
+
+[meta=description]
+Capatibility-based runtime modules for Substrate is an
+alternative design of Substrate Runtime Module Libraries. It aims at
+incoperating some capatibility-based system into runtime, to address
+some concerns on upgradability and security.
+
+The core idea of capatibility-based runtime modules is that instead of
+modules compiled in one single binary and communicating directly
+through internal calls, we design a root OS-like runtime. Each
+function modules are compiled individually as its own binary and only
+talk with the root OS-like runtime. The root OS-like runtime then
+handles communications with other modules through capatibilities.
+
+== Rationale
+
+The design of Substrate Runtime Module Libraries has significantly
+simplified runtime development for blockchains. In the mean time, we
+do still hear concerns regarding certain aspects of the current
+system:
+
+* There are very little separation of different runtime modules. This
+  brings in some security concerns, as any flaw in a single runtime
+  module will be a flaw for all runtime modules.
+* Decmoracy module is currently designed to update all aspects of the
+  blockchain using the same rule. This sometimes does not represent
+  the real needs, as in a law system, certain aspects (like the
+  constitution) should be much harder to change than others. We cannot
+  yet express this in the current model.
+* It is not always clear for users regarding the influences of its
+  funding when sending out transactions. The documentations usually
+  point it out clearly, but still, there is nothing on-chain that can
+  allow users to state clearly if it is willing to give the ability to
+  runtime modules to slash or transfer the balances.
+
+Capatibility-based runtime modules address those issues by:
+
+* Creating a root runtime. The root runtime acts as the "OS kernel" of
+  the whole runtime. All function runtime modules are sandboxed and
+  have their own child storage.
+* Provide any runtime modules the ability to define custom
+  capatibilities, and pass those capatibilities to other modules for
+  operations.
+* Provide users the ability to define their own capatibilities as
+  well. For example, "may slash X coins" or "may lock X coins". Users
+  pass those capatibilities as signed in a transaction, to parameters
+  of runtime module calls.
+
+== Design
+
+=== Root runtime and process modules
+
+The *root runtime* is the runtime that is directly operated by
+Substrate. *Process modules* are function runtime modules that is
+operated by the root runtime.
+
+The root runtime stores WebAssembly binaries of all process moudles,
+and upon each block, execute each process module one by one in the
+sandboxed WebAssembly environment. The sandboxed environment does not
+have the full storage access of the blockchain. Instead, it is only
+limited to a standalone child storage.
+
+=== Capatibility and invocation
+
+A *capatibility* has three items, the *owner*, the *process module*
+who created this capatibility, and the *capatibility data*. An
+*invocation* of a capatibility will execute a function call and
+consumes it. The invocation, besides passing the capatibility, also
+passes a *function name* and some *parameters*. This is to allow the
+sender to indicate how it wants to spend the capatibility. If a
+capatibility is repeatable, then the invocation may return new
+capatibilities. For example, a `balance::slashable(address, 100)`
+capatibility can be invoked with `slash(90)`, and if successful, it
+will return a new capatibilty `balance::slashable(address, 10)`.
+
+Note that a capatibility may become dangling, if an incompatible
+process module upgrade is enacted. The root runtime will make sure
+that capatibilies cannot be modified, but it's the process module's
+job to check whether a capatibility is valid.
+
+In an invocation, parameters to a function call can also be
+capatibilities. The capatibilities will be passed by root runtime from
+the sender to the receiver. The receiver can then store this
+capatibility for future use, to do invocations that it would otherwise
+not be able to do.
+
+Capatibilities can also be created by user transactions. Those are
+created through a special method call in process modules and can only
+be invoked by root runtime. A user transaction can contain a
+`requests` field that has a capatibility `balance::slashable(address,
+100)`. The root runtime will pass this capatibility to be checked by
+`balance` module, indicating that it is signed by the user. It creates
+this capatibility if the request is valid. Otherwise, the whole user
+transaction will fail directly.
+
+A capatibility cannot be copied by itself. Any duplicable capatibility
+will have a function call `duplicate` that can split the current
+capatibility to two.
+
+=== Process module lifecycle
+
+Each process module now has a lifecycle.
+
+Upon initialization, the system module will pass two system
+capatibilities to the process module -- `system::upgradable(module)`
+which will allow the process module to upgrade itself, and
+`system::destroy(module)` which will allow the process module to
+self-destruct.
+
+Note that it is solely up to the process module if it is upgradable or
+destroyable. If it plans to be, then it should duplicate those two
+capatibilities and pass them to a democracy module.
+
+== Example
+
+* For an upgradable process module, upon initialization, it receives
+  the two system capatibilities `system::upgradable(module)` and
+  `system::destory(module)`. The initialization parameter also
+  requires a capatibility with interface `push(<any capatibility>,
+  <rule>)` and `clear()`, which is supposed to point to a democracy
+  module, for example, `democracy::votable(id)`. The module then
+  pushes `system::upgradable(module)` along with other votable
+  capatibilities to democracy module. The democracy module presents
+  users with lists of capatibilities that it receives, and users can
+  vote to invoke those capatibilities under their specified rules.
+* For staking module, users, in their transactions, first specify a
+  capatibility request `balance::slashable(X)`. The extrinsic is then
+  set to `staking::bound(balance::slashable(X))`.
+
+== Implementation
+
+A viable way to implement capatibility-based runtime modules is to
+implement it as a SRML module. The root runtime becomes a normal
+modules that controls many sandboxed submodules.
