@@ -45,6 +45,7 @@ in the future, in order to improve the situation.
 .Table Emission
 |===
 | Start block | Count | Reward
+
 | 0 (era 1) | 320000 | 60
 | 0 (era 2) | 200000 | 60
 | 200000 | 5600 | 54
