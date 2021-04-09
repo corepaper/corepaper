@@ -5,7 +5,7 @@ Wei Tang <wei@that.world>
 [meta=description]
 Capability-based runtime modules for Substrate is an
 alternative design of Substrate Runtime Module Libraries. It aims at
-incoperating some capability-based system into runtime, to address
+incorporating some capability-based system into runtime, to address
 some concerns on upgradability and security.
 
 The core idea of capability-based runtime modules is that instead of
@@ -25,7 +25,7 @@ system:
 * There are very little separation of different runtime modules. This
   brings in some security concerns, as any flaw in a single runtime
   module will be a flaw for all runtime modules.
-* Decmoracy module is currently designed to update all aspects of the
+* Democracy module is currently designed to update all aspects of the
   blockchain using the same rule. This sometimes does not represent
   the real needs, as in a law system, certain aspects (like the
   constitution) should be much harder to change than others. We cannot
@@ -60,7 +60,7 @@ The *root runtime* is the runtime that is directly operated by
 Substrate. *Process modules* are function runtime modules that is
 operated by the root runtime.
 
-The root runtime stores WebAssembly binaries of all process moudles,
+The root runtime stores WebAssembly binaries of all process modules,
 and upon each block, execute each process module one by one in the
 sandboxed WebAssembly environment. The sandboxed environment does not
 have the full storage access of the blockchain. Instead, it is only
