@@ -42,7 +42,7 @@ Change the behavior of the following opcodes:
 * In `CODECOPY`, if `stack(1) + stack(2)` overflows or is greater than
   the length of code, return unrecoverable error.
 * In `EXTCODECOPY`, if `stack(2) + stack(3)` overflows or is greater
-  than the legnth of external code, return unrecoverable error.
+  than the length of external code, return unrecoverable error.
 
 === Interactions
 
@@ -65,7 +65,7 @@ discuss: https://github.com/corepaper/corepaper/issues/2
 Current EVM silently grows memory, whenever a higher region is
 accessed. While this design does not have apparent downside, it
 slightly complicates analysis of a program and implementation of EVM,
-in that the total memory used is implict. In this specification, we
+in that the total memory used is implicit. In this specification, we
 explore ways to use new opcodes `GROWMEMORY` to make memory growth
 explicit.
 
@@ -75,7 +75,7 @@ Add opcode `GROWMEMORY` (`0xfd`). It pops one item `target` from the
 stack. The instruction charges `G_BASE` and then sets the total
 available memory size to `target`. It then charge gas cost according
 to current rules for memory cost. If `target` is smaller than the
-current memory size, the instuction will shrink the memory, but will
+current memory size, the instruction will shrink the memory, but will
 not refund any gas. If the gas cost charge fails, return out-of-gas
 error.
 

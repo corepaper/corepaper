@@ -26,7 +26,7 @@ security properties as Sassafras. The overall process works as follows:
    consensus engine at the end of the block. Invalid VRFs are
    simply ignored.
 2.2. The reason for publishing as transactions is for future reward
-   system extension, which will be han dled by runtime, and for reuse
+   system extension, which will be handled by runtime, and for reuse
    of transaction pool.
 3. At the end block of epoch stem:[N+1], consensus sorts the VRF gathered
    as this epoch, using "outside-in" order.

@@ -10,7 +10,7 @@ that were not originally designed with Substrate in mind.
 
 In general, blockchains implemented in Substrate only have to
 implement the `Block` trait. It then can be used in most Substrate
-libraries, as they only make asumptions on the trait. However,
+libraries, as they only make assumptions on the trait. However,
 completely implementing the trait from scratch is not simple, so
 Substrate also provides a generic `Block` struct that implements the
 `Block` trait.
@@ -18,7 +18,7 @@ Substrate also provides a generic `Block` struct that implements the
 Substrate makes some assumptions about terminologies. Block header
 data is always either directly from state processing, or sealable by
 consensus engines. All external inputs are put in block bodies,
-groupped as "extrinsics", where unsigned ones are called "inherents",
+grouped as "extrinsics", where unsigned ones are called "inherents",
 and signed ones are called "transactions". This design sometimes
 cannot directly be translated from blockchains that weren't designed
 with Substrate in mind. For example, Ethereum's block extra data is an
