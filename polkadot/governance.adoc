@@ -1,0 +1,68 @@
+= Polkadot governance
+Wei Tang <wei@that.world>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[meta=description]
+This section documents various proposed governance improvements for Polkadot,
+Kusama, and network-alikes.
+
+== Blind voting for Polkadot
+[spec]
+id: 58-BVOTE
+discuss: https://github.com/corepaper/corepaper/discussions/12
+
+Currently, voting results of a democracy referendum are published in real time.
+If a user holds an opposite opinion of what the current "majority" thinks, one
+may be hesistant to express oneself. If a large group of users do this, we may
+lead to a situation of a "silent majority". This system also gives some unfair
+advantages for those who vote very first (because they can influence the initial
+sentiment of the public), or those who vote very last (because they will have a
+good idea how much they should use to vote and lock in order to sway the voting
+results around).
+
+This proposal changes the voting rule so that we divide the voting period into
+two phrases. In the first phrase, everyone votes blindly, by publishing a
+pre-image hash onto the blockchain, and then in the second phrase, the pre-image
+is revealed.
+
+=== Specification
+
+Divide the voting period into two phrases, blind voting phrase and revealing
+phrase.
+
+Change `democracy.vote`. It still takes vote value and conviction in cleartext.
+However, the voting choice "Aye" or "Nay" is changed as follows:
+
+* In blind voting phrase, every voter generates a 32-byte secret, and compute
+  the hash of SCALE encoding `(secret, AYE)` if one wants to vote Aye, or
+  `(secret, Nay)` if one wants to vote Nay.
+* The voter then publishes the hash to the blockchain. As the vote value and
+  conviction at this stage is cleartext, the coin is then locked for the specified
+  enactment.
+* In revealing phrase, every voter reveals the preimage. The 32-byte secret is
+  then discarded, and the voting choice Aye or Nay is recorded.
+* Once the releaving phrase is finished, the referendum is accepted or rejected
+  based on the current voting rules.
+
+== Allow explicit abstain in adaptive quorum biasing
+[spec]
+id: 59-ABVOTE
+discuss: https://github.com/corepaper/corepaper/discussions/13
+
+Allow explict abstain votes, for voters who really don't have an opinion on a
+referendum, but still wants to participate in governance. In case of adaptive
+quorum biasing, abstain votes are counted in the total turnout.
+
+=== Specification
+
+Add a third type of choice for voting -- abstain.
+
+In case of adaptive quorum biasing, the voting result is calculated as follows,
+where stem:[T] is the total issuance, stem:[Aye], stem:[Nay] and stem:[Abs] are
+the total number of coins voted Aye, Nay and Abstain respectively.
+
+* For a super-majority approve referendum, we calculate if stem:[\frac{Nay}{Aye
++ Nay + Abs} < \frac{Aye}{T}]
+* For a super-majority against referendum, we calculate if stem:[\frac{Nay}{T} <
+\frac{Aye}{Aye + Nay + Abs}]
