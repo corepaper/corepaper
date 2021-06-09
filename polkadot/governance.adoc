@@ -7,6 +7,80 @@ Wei Tang <wei@that.world>
 This section documents various proposed governance improvements for Polkadot,
 Kusama, and network-alikes.
 
+== Council Keep-Alive
+[spec]
+id: 60-CKA
+discuss: https://github.com/corepaper/corepaper/discussions/14
+
+Historically, many councils in Polkadot-alike networks suffer from inactivity
+issues. The councils are also suffering some additional problems.
+
+* A motion can span across multiple council terms. In this case, when council
+  memberships change, old votes become invalid. Council can also be with seats
+  empty, and this can cause a council motion becomes totally invalid due to
+  required approval count when a new council term begins.
+* The difference between no-vote and abstain is blur. In the past, some council
+  members have indicated that they do not have strong preferences over some
+  council motions, or they need more time to think about it. Currently, it is
+  hard to differentiate that from simple inactivity.
+* The current council design does not promote thoughtful council discussions.
+  Rather, it simply encourages people to either immediately vote or to remain
+  in abstained status.
+
+=== Specification
+
+Define council period as stem:[P]. A council term is stem:[2P] and council
+elections happen every council term. A council term begins with a
+stem:[P]-length proposing period, and ends with a stem:[P]-length voting period.
+
+=== Proposing period
+
+During the proposing period, all council members can propose council motions
+(for as many as they want). The motions are recorded on-chain, but unvoted. It
+is expected that council members use this period to thoroughly discuss motions,
+before reaching any conclusions.
+
+Council motion semantics remain unchanged. It will still require at least
+`threshold` votes (as defined in the motion) to pass.
+
+=== Voting period
+
+Once the proposing period ends, all proposals during that period enters voting
+status in the voting period. No new motions can be proposed during this period.
+
+Instead of voting on individual motions, council members submit a full council
+report via a new extrinsic `council.submitReport`. The report is a list of tuple
+of `(motion_id, pref)` where `pref` can be `Aye`, `Nay` or `Abstain`.
+
+A council report cannot miss any votes. Missing-votes council reports are
+invalid, and `council.submitReport` will reject any such extrinsics. The goal
+here is to make sure all motions under the current voting period is considered.
+
+=== Motion approval
+
+At the end of the voting period, motions enter one of the following status.
+
+* **Approved** if more than or equal to threshold council members voted Aye.
+  The motion passes and gets executed.
+* **Rejected** if more than `(total - threshold)` council members voted Nay.
+  The motion is rejected.
+* **Delayed** if none of the above happens. Indicate that council members
+  haven't made up their minds. If not enough people voted Aye and not enough
+  people voted Nay, then the council motion will be delayed, and voted again in
+  the next council term's voting period (by entering the next proposing period).
+
+=== Aliveness check
+
+By the end of the voting period, if a council member fails to submit a council
+report, then it is removed from the next election's candidacy list. This simply
+gives other runners-up a chance to join and does not imply any ill-will.
+Candidate votes are kept, and the previous council member can later submit
+candidacy again to become active.
+
+With aliveness check and an explict abstain vote option, we can expect council
+members to be more active, and as a result, the notion of "prime member" does
+not hold any special rights any more.
+
 == Blind voting for Polkadot
 [spec]
 id: 58-BVOTE
