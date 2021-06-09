@@ -10,7 +10,7 @@ Kusama, and network-alikes.
 == Council Keep-Alive
 [spec]
 id: 60-CKA
-discuss: https://github.com/corepaper/corepaper/discussions/14
+discuss: https://github.com/corepaper/corepaper/discussions/15
 
 Historically, many councils in Polkadot-alike networks suffer from inactivity
 issues. The councils are also suffering some additional problems.
