@@ -27,7 +27,7 @@ issues. The councils are also suffering some additional problems.
   Rather, it simply encourages people to either immediately vote or to remain
   in abstained status.
 
-=== Specification
+=== Council period and term
 
 Define council period as stem:[P]. A council term is stem:[2P] and council
 elections happen every council term. A council term begins with a
