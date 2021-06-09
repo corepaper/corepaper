@@ -17,7 +17,7 @@ issues. The councils are also suffering some additional problems.
 
 * A motion can span across multiple council terms. In this case, when council
   memberships change, old votes become invalid. Council can also be with seats
-  empty, and this can cause a council motion becomes totally invalid due to
+  empty, and this can cause a council motion to become totally invalid due to
   required approval count when a new council term begins.
 * The difference between no-vote and abstain is blur. In the past, some council
   members have indicated that they do not have strong preferences over some
