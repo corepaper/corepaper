@@ -81,6 +81,16 @@ With aliveness check and an explict abstain vote option, we can expect council
 members to be more active, and as a result, the notion of "prime member" does
 not hold any special rights any more.
 
+=== Emergency motion
+
+In some occasions, emergency motions have to be proposed. For them, we design a
+special motion category. Emergency motions are voted as soon as it is tabled.
+Emergency motion only lasts time stem:[E] (recommended to be only several hours)
+and there is only one voting choice -- Second. If more than threshold council
+members seconded an emergency motion, then it passes and gets executed. If less
+than threshold council members seconded an emergency motion, then it is
+rejected.
+
 == Blind voting for Polkadot
 [spec]
 id: 58-BVOTE
