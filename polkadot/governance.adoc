@@ -54,7 +54,7 @@ of `(motion_id, pref)` where `pref` can be `Aye`, `Nay` or `Abstain`.
 
 A council report cannot miss any votes. Missing-votes council reports are
 invalid, and `council.submitReport` will reject any such extrinsics. The goal
-here is to make sure all motions under the current voting period is considered.
+here is to make sure all motions under the current voting period are considered.
 
 === Motion approval
 
