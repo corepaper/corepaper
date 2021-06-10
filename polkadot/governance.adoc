@@ -10,7 +10,7 @@ Kusama, and network-alikes.
 == Council Keep-Alive
 [spec]
 id: 60-CKA
-discuss: https://github.com/corepaper/corepaper/discussions/15
+discuss: https://polkadot.polkassembly.io/post/478
 
 Historically, many councils in Polkadot-alike networks suffer from inactivity
 issues. The councils are also suffering some additional problems.
@@ -94,7 +94,7 @@ rejected.
 == Blind voting for Polkadot
 [spec]
 id: 58-BVOTE
-discuss: https://github.com/corepaper/corepaper/discussions/12
+discuss: https://polkadot.polkassembly.io/post/478
 
 Currently, voting results of a democracy referendum are published in real time.
 If a user holds an opposite opinion of what the current "majority" thinks, one
@@ -132,7 +132,7 @@ However, the voting choice "Aye" or "Nay" is changed as follows:
 == Allow explicit abstain in adaptive quorum biasing
 [spec]
 id: 59-ABVOTE
-discuss: https://github.com/corepaper/corepaper/discussions/13
+discuss: https://polkadot.polkassembly.io/post/478
 
 Allow explict abstain votes, for voters who really don't have an opinion on a
 referendum, but still wants to participate in governance. In case of adaptive
