@@ -1,0 +1,116 @@
+= Polkadot staking
+Wei Tang <wei@that.world>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[meta=description]
+The section documents Polkadot's staking election situations, problems and
+discussions about potential solutions.
+
+== Background
+
+In recent days, Polkadot's staking election algorithm wasn't working really
+as expected. Polkadot suffered two out-of-memory (OOM) incidents, both time
+happened in the staking election algorithm.
+
+The staking election algorithm has two parts -- one off-chain calculation part,
+where the winners and their supports are calculated, and another verification
+part, where the solutions are submitted and verified.
+
+The calculation part is expensive, and requires a heuristic algorithm. The
+heuristic algorithm will do several passes to get a more optimal solution. This
+calculation part also has an on-chain fallback, ensuring that a new validator
+set is always elected.
+
+The verification part is linear time and cheap. When a solution is submitted, it
+contains the winners and their supports. From there, the score value is
+calculated with a single pass of the solution.
+
+Unfortunately, in the recent incidents, both the calculation part and the
+verification part broke, due to the nominator set being large. The
+link:https://polkadot.network/a-polkadot-postmortem-24-05-2021[20210524
+incident] happened due to the off-chain calculation part running out-of-memory
+-- the overall memory running out in WebAssembly. The 20210617 incident
+happened due to the verification part running out-of-memory -- the allocator
+limit was reached.
+
+Both time, network participants were asked to switch to older node version of
+0.8.30 where the native runtime can be used. In the 20210524 incident, a
+separate, unrelated second issue was caused because of the downgrade, which you
+can read in the 20210524 postmortem.
+
+== Analysis
+
+The two parts of the election algorithms have different causes, and we analyze
+them independently.
+
+=== OOM of solution calculation
+
+The solution calculation part is expensive. However, it is supposed to be
+off-chain. So this is essentially just a code optimization problem and we
+shouldn't have any practical limit here.
+
+=== OOM of solution verification
+
+The verification part is linear time. However, it must happen on-chain.
+Unfortunately, as an on-chain operation, we should consider it to be quite
+expensive -- because it is essentially a stop-the-world operation in a
+blockchain context. The solution must be submitted at once, with all the winners
+and supports information. It has to be then processed, and at least temporarily
+stored in memory, of its full.
+
+The allocator limit was 16 MiB before the 20210617 incident. Assuming it was not
+due to other optimization bottleneck, this does pose a theoretical limit for how
+many nominators we can support given the current algorithm, even if we delegate
+full block and full WebAssembly memory to the election algorithm. It will be *at
+most* x256 size of the current number of nominators, and in reality probably
+much less.
+
+== Fixes
+
+Current known proposed or implemented fixes of the OOM problem. Note that none
+of the fixes can completely deal with the issue, due to the nature of
+stop-the-world operation of the verification part. It either optimizes memory
+usages or WebAssembly executions (leaving the essence of the algorithm
+unchanged) or imposes on-chain limits that have the corresponding centralization
+concerns.
+
+=== Bump the memory limits and implement a better allocator
+
+The memory limits currently imposed on the runtime is still much lower than what
+the WebAssembly executor allows. Thus most of the current immediate problem can
+be fixed by bumping the memory limit. The current allocator for WebAssembly
+runtime is also not the most efficient. A better allocator would also help a lot
+in this case.
+
+This is how currently the 20210524 incident and the 20210617 incident are fixed,
+in link:https://github.com/paritytech/substrate/pull/8892[#8892] and
+link:https://github.com/paritytech/substrate/pull/9102[#9102].
+
+=== Remove the on-chain fallback for solution calculation
+
+Solution calculation is expensive. Thus doing it on-chain is dangerous -- a bomb
+waiting to be triggered. When no solution is submitted off-chain, the election
+is skipped and we continue to use the current validator set. The election is
+delayed till later.
+
+This is currently implemented in
+link:https://github.com/paritytech/substrate/pull/8912[#8912].
+
+=== Impose minimum staking bond limits for nominators
+
+By imposing a minimum staking bond limit, it limits the number of nominators
+that can participate in staking. The obvious issue of this is that it encourages
+users to form pools off-chain, which leads to varying degrees of centralization.
+As networks grow larger, the centralization concern will become more and more
+pressing.
+
+This is currently implemented in
+link:https://github.com/paritytech/substrate/pull/8920[#8920].
+
+=== Delegated nominated proof of stake
+
+Instead of pushing smaller stakers off-chain, they can be encouraged to delegate
+their nominations on-chain to another nominator. This indirection of delegation
+is still not ideal, but it addresses some of the centralization concerns above
+by still encouraging users to at least hold their own wallets.
