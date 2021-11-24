@@ -47,7 +47,7 @@ information:
 - *Basic*: This includes basic information such as account balance and
   nonce.
 - *Code hash*: Code of the account.
-- *Child storage*: Storage values of the account.
+- *Memory*: Memory values of the account.
 - *Messages*: Collection of unhandled messages sent to this contract.
 
 Actors can spawn new actors, which act as the child actor of the
@@ -56,6 +56,28 @@ messages and storages being discarded.
 
 [fn:2] Actors are encouraged to be small and cheap to execute, for
 separation of concerns and decreased likelihood of bugs.
+
+*** Memory
+In an actor, it is discouraged to do dynamic allocation. Instead, an
+actor declares the page size it needs and statically allocate
+everything in advance. Additional resources are represented by
+creating new actors.
+
+An actor has no additional storage. Instead, its memory region is
+persisted across execution. On the other hand, library has its own
+memory and it always has fresh memory upon execution.
+
+In a WebAssembly actor, actor execution are split into "steps". Each
+step is a single function invocation. Upon invocation, persisted
+memory is copied over but it gets fresh stack. The invocation either
+receives a single message, or no message, depending on the
+circumstances.
+
+At the end of the invocation, the actor returns the next expected step
+invocation. This can either be declared to be when the next message is
+received, or a specific block. Then, fees must be paid. If no
+declaration is made or fee payment is unsuccessful, then the actor
+becomes inactive.
 
 ** Actor group
 Because we will be having a large number of actors, they must be cheap
