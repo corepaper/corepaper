@@ -153,7 +153,7 @@ the total number of coins voted Aye, Nay and Abstain respectively.
 
 == Candle voting for governance referendum
 [spec]
-id: 60-CANDLE
+id: 61-CANDLE
 discuss: https://polkadot.polkassembly.io/post/478
 
 The participation rates on Polkadot referendum are still quite low --
