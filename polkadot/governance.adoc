@@ -159,7 +159,7 @@ discuss: https://polkadot.polkassembly.io/post/478
 The participation rates on Polkadot referendum are still quite low --
 less than 1%. Many don't vote because the referendum is already of
 their desired outcomes. However, it is currently extremely vulnerable
-to an adversary swaying the outcome last minute (only take couple
+to an adversary swaying the outcome last minute (it only takes couple
 thousands of worth of DOTs). Rather than trying on the direction of
 improving participation rates (which we have arguably failed to do),
 this proposal tries to trackle it from another direction by allowing
