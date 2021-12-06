@@ -150,3 +150,38 @@ the total number of coins voted Aye, Nay and Abstain respectively.
 + Nay + Abs} < \frac{Aye}{T}]
 * For a super-majority against referendum, we calculate if stem:[\frac{Nay}{T} <
 \frac{Aye}{Aye + Nay + Abs}]
+
+== Candle voting for governance referendum
+[spec]
+id: 60-CANDLE
+discuss: https://polkadot.polkassembly.io/post/478
+
+The participation rates on Polkadot referendum are still quite low --
+less than 1%. Many don't vote because the referendum is already of
+their desired outcomes. However, it is currently extremely vulnerable
+to an adversary swaying the outcome last minute (only take couple
+thousands of worth of DOTs). Rather than trying on the direction of
+improving participation rates (which we have arguably failed to do),
+this proposal tries to trackle it from another direction by allowing
+people to continue their current behaviors, while trying to protect
+everyone from last minute swaying, by using *candle voting*.
+
+=== Specification
+
+Split the voting period into two parts. The first part takes
+stem:[\frac{5}{7}] of the current voting period time, and the second
+part takes stem:[\frac{2}{7}] of the current period time.
+
+* During the first part, voting happens as normal, unchanged.
+* During the second part (also called the ending period), voting
+  happens as normal. However, at the end of the total period, voting
+  is decided to have ended in an earlier block number during the
+  ending period, by an on-chain random number generator.
+
+This way, an adversary trying to sway a referendum outcome last minute
+has a high chance of failing. If the adversary tries to vote during
+the last minute of the first part, then other participants can quickly
+react during the beginning of the ending period. If the adversary
+tries to vote during the last minute of the second part, then there is
+a high chance that the voting will have been decided to have already
+ended.
