@@ -2,6 +2,8 @@
   "title": "Core Paper",
   "url": "https://corepaper.org",
   "baseUrl": "/",
+  "author": "Wei Tang",
+  "email": "wei@that.world",
   "github": "https://github.com/corepaper/corepaper",
   "sitemap": {
     "enable": true
