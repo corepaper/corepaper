@@ -1,4 +1,5 @@
 #+title: Actor-based contract
+#+subtitle: Asynchronous model for smart contracts
 
 Actor-based contract model aims at solving some of the outstanding
 issues in current call-based contract model in backward compatibility,
