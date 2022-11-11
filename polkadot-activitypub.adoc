@@ -1,0 +1,115 @@
+= Polkadot Governance Forum on ActivityPub
+Wei Tang <wei@that.world>
+:license: CC-BY-SA-4.0
+:license-code: Apache-2.0
+
+[meta=description]
+A decentralized blockchain needs a decentralized governance discussion
+platform.
+
+== Rationale
+
+At this moment, discussions around governance are scattered in
+several non-connected places, such as Polkassembly, Polkasqure and
+Commonwealth. This is not optimal for a blockchain setting. Even most
+of them have their source code open, data are not. This makes it
+difficult for Polkadot users to switch to a different platform, even
+when they have better features. Things like this hurt innovation
+within the ecosystem.
+
+This specification proposes to extend existing governance discussion
+platforms using the ActivityPub protocol to free the data.
+
+== Design
+
+Below we use the ActivityPub terms *actors*, *objects*, *collections*,
+and *activities*.
+
+The design takes inspirations from existing ActivityPub softwares like
+Mastodon and Lemmy, and tries to remain compatible when possible (so
+that you can also, for example, follow a Polkadot forum from
+Mastodon, or join the forum as a Lemmy community).
+
+=== Actors
+
+==== Square
+
+An automated actor representing a *forum category*, a *topic*, or a
+*community*.
+
+Users can send posts and comments to it, which then get forwarded to
+followers.
+
+A square can also follow other sqaures. If this happens, any posts and
+comments on the followed square will be forwarded to the following
+sqare. If two squares follow each other, they are considered *merged*
+(because posts will now appear on both sides).
+
+* Send activities to user: `Accept/Follow`, `Announce`.
+* Send activities to square: `Accept/Follow`, `Announce`.
+
+==== User
+
+A user account residing on an instance.
+
+* Send activities to square: `Follow`, `Undo/Follow`, `Create`,
+  `Update`.
+
+==== Instance
+
+Represents an ActivityPub instance. Store site-specific global data.
+
+=== Objects
+
+==== Post
+
+Represents a post in a square.
+
+Moderators of an instance or the post creator can associate an
+on-chain event or object to a post.
+
+Each association must contain the network name. This allows
+cross-chain discussion to happen within the same post. However, for
+moderation purposes, an instance may want to restrict a square to only
+a single network.
+
+Supported associations:
+
+* *Referendum*: network name, referendum ID.
+* *Council motion*: network name, motion ID.
+* *Treasury proposal*: network name, treasury proposal ID.
+
+If two posts cross instances represent essentially the same thing,
+moderators can also "merge" posts together. If this happens, one of
+the post data will be shown (with the other hidden), and replies to
+both posts will be shown under the same post.
+
+==== Comment
+
+A reply to a post, or a reply to a comment.
+
+=== Activities
+
+User to square:
+
+* Follow
+* Unfollow
+
+Suqare to user:
+
+* Accept follow
+* Announce
+
+Square to square:
+
+* Follow
+* Accept follow
+* Announce
+
+Announcable:
+
+* Create or update post
+* Create or update comment
+* Create or update post associations
+* Merge posts
+* Delete post or comment
